@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:paddingTop="@dimen/radiusSize"
+    android:paddingBottom="@dimen/radiusSize"
+    >
+
+    <!-- Настройки-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/light_modesetting" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/setting"
+            android:textColor="@color/black"
+            android:textSize="@dimen/activity_text_size" />
+    </LinearLayout>
+
+    <!-- Темная тема -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clipChildren="false"
+        android:paddingTop="@dimen/radiusSize"
+        android:paddingStart="@dimen/radiusSize"
+        android:paddingBottom="@dimen/radiusSize"
+        tools:ignore="RtlSymmetry">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dark_theme"
+            android:textColor="@color/black"
+            android:textSize="@dimen/setting_text" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:translationY="1dp"
+                android:src="@drawable/track"
+                android:layout_marginEnd="@dimen/ic_padding"/>
+
+            <ImageView
+                android:id="@+id/knobButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:translationY="-2dp"
+                android:src="@drawable/knob"
+                android:layout_marginEnd="@dimen/ic_padding"/>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Поделиться -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clipChildren="false"
+        android:paddingTop="@dimen/radiusSize"
+        android:paddingStart="@dimen/radiusSize"
+        android:paddingBottom="@dimen/radiusSize"
+        tools:ignore="RtlSymmetry">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/share"
+            android:textColor="@color/black"
+            android:textSize="@dimen/setting_text" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/shareButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/share"
+                android:layout_marginEnd="@dimen/ic_padding" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Поддержка -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clipChildren="false"
+        android:paddingTop="@dimen/radiusSize"
+        android:paddingStart="@dimen/radiusSize"
+        android:paddingBottom="@dimen/radiusSize"
+        tools:ignore="RtlSymmetry">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/support"
+            android:textColor="@color/black"
+            android:textSize="@dimen/setting_text" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/helpButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/support"
+                android:layout_marginEnd="@dimen/ic_padding" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Соглашение -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clipChildren="false"
+        android:paddingTop="@dimen/radiusSize"
+        android:paddingStart="@dimen/radiusSize"
+        android:paddingBottom="@dimen/radiusSize"
+        tools:ignore="RtlSymmetry">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/agreement"
+            android:textColor="@color/black"
+            android:textSize="@dimen/setting_text" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/agreementButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/agreement"
+                android:layout_marginEnd="@dimen/ic_padding" />
+        </FrameLayout>
+    </LinearLayout>
+</LinearLayout>

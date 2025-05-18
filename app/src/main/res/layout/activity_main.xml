@@ -1,19 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#3772E7">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="@dimen/activity_text_size" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="24dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/search"
+            android:layout_width="@dimen/activity_width"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/activity_marginStart"
+            android:layout_weight="1"
+            android:backgroundTint="@color/white"
+            android:text="@string/search"
+            android:textAllCaps="false"
+            app:cornerRadius="@dimen/radiusSize"
+            android:textColor="@color/black"
+            android:textSize="@dimen/activity_text_size"
+            app:icon="@drawable/ic_vector"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/medium_padding"
+            app:iconTint="@color/black" />
+
+        <Button
+            android:id="@+id/media"
+            android:layout_width="@dimen/activity_width"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/activity_marginStart"
+            android:layout_weight="1"
+            android:backgroundTint="@color/white"
+            android:text="@string/media"
+            android:textAllCaps="false"
+            app:cornerRadius="@dimen/radiusSize"
+            android:textColor="@color/black"
+            android:textSize="@dimen/activity_text_size"
+            app:icon="@drawable/light_mode"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/medium_padding"
+            app:iconTint="@color/black" />
+
+        <Button
+            android:id="@+id/setting"
+            android:layout_width="@dimen/activity_width"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/activity_marginStart"
+            android:layout_weight="1"
+            android:backgroundTint="@color/white"
+            android:text="@string/setting"
+            android:textAllCaps="false"
+            app:cornerRadius="@dimen/radiusSize"
+            android:textColor="@color/black"
+            android:textSize="@dimen/activity_text_size"
+            app:icon="@drawable/vector"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/medium_padding"
+            app:iconTint="@color/black"/>
+    </LinearLayout>
+
+</LinearLayout>
