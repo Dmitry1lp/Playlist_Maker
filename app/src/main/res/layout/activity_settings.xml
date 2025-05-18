@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white"
     android:paddingTop="@dimen/radiusSize"
-    android:paddingBottom="@dimen/radiusSize"
-    >
+    android:paddingBottom="@dimen/radiusSize">
 
     <!-- Настройки-->
     <LinearLayout
@@ -53,25 +52,19 @@
             android:textColor="@color/black"
             android:textSize="@dimen/setting_text" />
 
-        <FrameLayout
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/settingSwitch"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:thumbTint="@color/selector_switch_thumb"
+            app:trackTint="@color/selector_switch_track"
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:translationY="1dp"
-                android:src="@drawable/track"
-                android:layout_marginEnd="@dimen/ic_padding"/>
-
-            <ImageView
-                android:id="@+id/knobButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:translationY="-2dp"
-                android:src="@drawable/knob"
-                android:layout_marginEnd="@dimen/ic_padding"/>
-        </FrameLayout>
+            android:checked="false"
+            android:layout_marginEnd="@dimen/ic_padding"
+            android:layout_marginStart="@dimen/ic_padding"
+            app:useMaterialThemeColors="false"
+            app:showText="false" />
     </LinearLayout>
 
     <!-- Поделиться -->

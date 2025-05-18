@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
-    android:background="#3772E7">
+    android:background="@color/backgroundMain">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
 
         <Button
             android:id="@+id/search"
-            android:layout_width="@dimen/activity_width"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/activity_marginStart"
             android:layout_weight="1"
@@ -45,7 +45,7 @@
 
         <Button
             android:id="@+id/media"
-            android:layout_width="@dimen/activity_width"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/activity_marginStart"
             android:layout_weight="1"
@@ -62,7 +62,7 @@
 
         <Button
             android:id="@+id/setting"
-            android:layout_width="@dimen/activity_width"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/activity_marginStart"
             android:layout_weight="1"

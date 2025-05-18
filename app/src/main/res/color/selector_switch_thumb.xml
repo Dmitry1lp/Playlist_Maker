@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- ВЫКЛ (unchecked) -->
+    <item android:state_checked="false" android:color="@color/knob_off"/>
+    <!-- ВКЛ (checked) -->
+    <item android:color="@color/knob_on"/>
+</selector>
