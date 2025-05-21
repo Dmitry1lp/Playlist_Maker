@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.appbar.MaterialToolbar
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,9 +15,9 @@ class SettingsActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_settings)
 
-        val backButton = findViewById<ImageView>(R.id.backButton)
+        val backButton = findViewById<MaterialToolbar>(R.id.toolbarSetting)
 
-        backButton.setOnClickListener {
+        backButton.setNavigationOnClickListener {
             finish()
 
         }

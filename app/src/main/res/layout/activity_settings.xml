@@ -11,61 +11,28 @@
     android:paddingBottom="@dimen/radiusSize">
 
     <!-- Настройки-->
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarSetting"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_height="?attr/actionBarSize"
+        app:title="@string/setting"
+        app:navigationIcon="@drawable/light_modesetting"
+        app:titleTextAppearance="@style/TextAppearance.ToolbarTitle.Normal" />
 
-        <ImageView
-            android:id="@+id/backButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/light_modesetting" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/setting"
-            android:textColor="@color/black"
-            android:textSize="@dimen/activity_text_size" />
-    </LinearLayout>
 
     <!-- Темная тема -->
-    <LinearLayout
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/settingSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:clipChildren="false"
-        android:paddingTop="@dimen/radiusSize"
-        android:paddingStart="@dimen/radiusSize"
-        android:paddingBottom="@dimen/radiusSize"
-        tools:ignore="RtlSymmetry">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="20dp"
+        app:thumbTint="@color/selector_switch_thumb"
+        app:trackTint="@color/selector_switch_track"
+        android:text="@string/dark_theme"
+        android:textSize="16sp" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/dark_theme"
-            android:textColor="@color/black"
-            android:textSize="@dimen/setting_text" />
-
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/settingSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:thumbTint="@color/selector_switch_thumb"
-            app:trackTint="@color/selector_switch_track"
-
-            android:checked="false"
-            android:layout_marginEnd="@dimen/ic_padding"
-            android:layout_marginStart="@dimen/ic_padding"
-            app:useMaterialThemeColors="false"
-            app:showText="false" />
-    </LinearLayout>
 
     <!-- Поделиться -->
     <LinearLayout
