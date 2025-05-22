@@ -28,6 +28,8 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
         android:paddingVertical="20dp"
+        android:textColor="?attr/colorOnBackground"
+        android:fontFamily="@font/ys_display_regular"
         app:thumbTint="@color/selector_switch_thumb"
         app:trackTint="@color/selector_switch_track"
         android:text="@string/dark_theme"
@@ -52,6 +54,7 @@
             android:layout_weight="1"
             android:text="@string/share"
             android:textColor="@color/black"
+            android:fontFamily="@font/ys_display_regular"
             android:textSize="@dimen/setting_text" />
 
         <FrameLayout
@@ -83,6 +86,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/ys_display_regular"
             android:text="@string/support"
             android:textColor="@color/black"
             android:textSize="@dimen/setting_text" />
@@ -117,6 +121,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/agreement"
+            android:fontFamily="@font/ys_display_regular"
             android:textColor="@color/black"
             android:textSize="@dimen/setting_text" />
 
