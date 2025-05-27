@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="?attr/colorOnPrimary"
     android:paddingTop="@dimen/radiusSize"
     android:paddingBottom="@dimen/radiusSize">
 
@@ -14,8 +14,10 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarSetting"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
+        style="@style/SettingText"
         app:title="@string/setting"
+        app:navigationIconTint="?attr/colorPrimaryVariant"
         app:navigationIcon="@drawable/light_modesetting"
         app:titleTextAppearance="@style/TextAppearance.ToolbarTitle.Normal" />
 
@@ -25,27 +27,21 @@
         android:id="@+id/settingSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:thumbTint="@color/selector_switch_thumb"
+        app:trackTint="@color/selector_switch_track"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
         android:paddingVertical="20dp"
-        android:textColor="?attr/colorOnBackground"
-        android:fontFamily="@font/ys_display_regular"
-        app:thumbTint="@color/selector_switch_thumb"
-        app:trackTint="@color/selector_switch_track"
+        style="@style/SettingText"
         android:text="@string/dark_theme"
-        android:textSize="16sp" />
+         />
 
 
     <!-- Поделиться -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:clipChildren="false"
-        android:paddingTop="@dimen/radiusSize"
-        android:paddingStart="@dimen/radiusSize"
-        android:paddingBottom="@dimen/radiusSize"
+        style="@style/SettingViews"
         tools:ignore="RtlSymmetry">
 
         <TextView
@@ -53,67 +49,44 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/share"
-            android:textColor="@color/black"
-            android:fontFamily="@font/ys_display_regular"
-            android:textSize="@dimen/setting_text" />
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            style="@style/SettingText" />
 
             <ImageView
                 android:id="@+id/shareButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/share"
+                app:tint="?attr/colorPrimaryVariant"
                 android:layout_marginEnd="@dimen/ic_padding" />
-        </FrameLayout>
     </LinearLayout>
-
     <!-- Поддержка -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:clipChildren="false"
-        android:paddingTop="@dimen/radiusSize"
-        android:paddingStart="@dimen/radiusSize"
-        android:paddingBottom="@dimen/radiusSize"
+        style="@style/SettingViews"
         tools:ignore="RtlSymmetry">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:fontFamily="@font/ys_display_regular"
             android:text="@string/support"
-            android:textColor="@color/black"
-            android:textSize="@dimen/setting_text" />
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            style="@style/SettingText" />
 
             <ImageView
                 android:id="@+id/helpButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/support"
+                app:tint="?attr/colorPrimaryVariant"
                 android:layout_marginEnd="@dimen/ic_padding" />
-        </FrameLayout>
-    </LinearLayout>
 
+    </LinearLayout>
     <!-- Соглашение -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:clipChildren="false"
-        android:paddingTop="@dimen/radiusSize"
-        android:paddingStart="@dimen/radiusSize"
-        android:paddingBottom="@dimen/radiusSize"
+        style="@style/SettingViews"
         tools:ignore="RtlSymmetry">
 
         <TextView
@@ -121,20 +94,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/agreement"
-            android:fontFamily="@font/ys_display_regular"
-            android:textColor="@color/black"
-            android:textSize="@dimen/setting_text" />
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            style="@style/SettingText" />
 
             <ImageView
                 android:id="@+id/agreementButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/agreement"
+                app:tint="?attr/colorPrimaryVariant"
                 android:layout_marginEnd="@dimen/ic_padding" />
-        </FrameLayout>
     </LinearLayout>
 </LinearLayout>

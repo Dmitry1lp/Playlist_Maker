@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">Playlist maker</string>
+    <string name="message" translatable="false">https://practicum.yandex.ru/profile/android-developer-plus/</string>
+    <string name="mailMessage" translatable="false">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="search" translatable="false">Поиск</string>
     <string name="search" translatable="false">Поиск</string>
     <string name="media" translatable="false">Медиатека</string>
     <string name="setting" translatable="false">Настройки</string>

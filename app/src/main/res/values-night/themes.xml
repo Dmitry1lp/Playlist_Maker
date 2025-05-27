@@ -1,7 +1,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary -->
+        <item name="colorPrimary">@color/black</item>          <!-- синий фон -->
+        <item name="colorPrimaryVariant">@color/white</item>   <!-- Темный фиолетовый -->
+        <item name="colorOnPrimary">@color/black</item>             <!-- Белый текст -->
+
+        <!-- Secondary -->
+        <item name="colorSecondary">@color/white</item>          <!-- Белый -->
+        <item name="colorSecondaryVariant">@color/teal_700</item>   <!-- Темный бирюзовый -->
+        <item name="colorOnSecondary">@color/black</item>           <!-- Черный текст -->
+
+        <!-- Система -->
+        <item name="android:statusBarColor">?attr/colorOnSecondary</item>
     </style>
 </resources>
+    <!--    <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />-->
