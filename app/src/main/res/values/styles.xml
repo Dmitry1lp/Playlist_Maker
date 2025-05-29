@@ -56,4 +56,19 @@
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:textSize">@dimen/setting_text</item>
     </style>
+    <style name="SearchEText">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/activity_search</item>
+        <item name="android:maxLength">16</item>
+        <item name="android:maxLines">1</item>
+        <item name="drawableTint">?attr/colorSecondaryVariant</item>
+        <item name="android:drawablePadding">@dimen/medium_padding</item>
+        <item name="android:layout_marginStart">@dimen/radiusSize</item>
+        <item name="android:layout_marginEnd">@dimen/radiusSize</item>
+        <item name="android:background">?attr/colorOnBackground</item>
+        <item name="android:textSize">@dimen/setting_text</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textColorHint">?attr/colorSecondaryVariant</item>
+    </style>
 </resources>

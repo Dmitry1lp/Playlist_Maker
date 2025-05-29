@@ -8,4 +8,6 @@
     <dimen name="activity_text_size">22sp</dimen>
     <dimen name="activity_width">328sp</dimen>
     <dimen name="activity_marginStart">10dp</dimen>
+    <dimen name="activity_search">48dp</dimen>
+    <dimen name="edit_search">12dp</dimen>
 </resources>

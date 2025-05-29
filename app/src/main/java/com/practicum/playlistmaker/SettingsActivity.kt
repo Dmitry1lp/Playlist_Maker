@@ -21,9 +21,6 @@ class SettingsActivity : AppCompatActivity() {
         val helpIcon = findViewById<ImageView>(R.id.helpButton)
         val agreementIcon = findViewById<ImageView>(R.id.agreementButton)
 
-        val mailMessage = "Спасибо разработчикам и разработчицам за крутое приложение!"
-        val mailTe = "Сообщение разработчикам и разработчицам приложения Playlist Maker"
-
         shareIcon.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.type = "text/plain"
@@ -35,7 +32,7 @@ class SettingsActivity : AppCompatActivity() {
             val helpIntent = Intent(Intent.ACTION_SENDTO)
             helpIntent.data = Uri.parse("mailto:")
             helpIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("perovdv1@ya.ru"))
-            helpIntent.putExtra(Intent.EXTRA_SUBJECT, mailTe)
+            helpIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.mailTe))
             helpIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.mailMessage))
             startActivity(helpIntent)
         }
@@ -48,7 +45,6 @@ class SettingsActivity : AppCompatActivity() {
 
         backButton.setNavigationOnClickListener {
             finish()
-
         }
     }
 }

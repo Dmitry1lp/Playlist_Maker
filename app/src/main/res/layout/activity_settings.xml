@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?attr/colorOnPrimary"
-    android:paddingTop="@dimen/radiusSize"
     android:paddingBottom="@dimen/radiusSize">
 
     <!-- Настройки-->
@@ -33,8 +32,7 @@
         android:paddingHorizontal="16dp"
         android:paddingVertical="20dp"
         style="@style/SettingText"
-        android:text="@string/dark_theme"
-         />
+        android:text="@string/dark_theme" />
 
 
     <!-- Поделиться -->

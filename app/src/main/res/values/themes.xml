@@ -2,14 +2,15 @@
     <!-- Base application theme. -->
     <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary -->
-        <item name="colorPrimary">@color/backgroundMain</item>          <!-- синий фон -->
-        <item name="colorPrimaryVariant">@color/black</item>   <!-- черный -->
-        <item name="colorOnPrimary">@color/white</item>             <!-- Белый текст -->
+        <item name="colorPrimary">@color/backgroundMain</item>          <!-- Фон -->
+        <item name="colorPrimaryVariant">@color/black</item>   <!-- Иконки -->
+        <item name="colorOnPrimary">@color/white</item>             <!-- Белый  -->
+        <item name="colorOnBackground">@color/track_off</item>
 
         <!-- Secondary -->
         <item name="colorSecondary">@color/white</item>          <!-- Белый -->
-        <item name="colorSecondaryVariant">@color/teal_700</item>   <!-- Темный бирюзовый -->
-        <item name="colorOnSecondary">@color/black</item>           <!-- Черный текст -->
+        <item name="colorSecondaryVariant">@color/light_search_bar</item>   <!-- Темный  -->
+        <item name="colorOnSecondary">@color/black</item>           <!-- Черный  -->
 
         <!-- Система -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
