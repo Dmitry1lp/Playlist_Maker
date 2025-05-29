@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorOnPrimary"
+    android:paddingBottom="@dimen/radiusSize">
+
+    <!-- Поиск-->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/SettingText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:title="@string/search"
+        app:navigationIconTint="?attr/colorPrimaryVariant"
+        app:navigationIcon="@drawable/light_modesetting"
+        app:titleTextAppearance="@style/TextAppearance.ToolbarTitle.Normal" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium_padding"
+        android:background="@drawable/search_bg"
+        app:layout_constraintTop_toBottomOf="@id/toolbarSearch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+    <!-- Поисковая строка -->
+    <EditText
+        android:id="@+id/inputEditText"
+        android:hint="@string/search"
+        android:drawableStart="@drawable/search_icon"
+        android:inputType="text"
+        android:textCursorDrawable="@drawable/cursor"
+        style="@style/SearchEText"
+        tools:ignore="InefficientWeight,RtlSymmetry" />
+
+    <ImageView
+        android:id="@+id/clearIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="end|center"
+        android:paddingEnd="20dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:visibility="gone"
+        app:tint="@color/black"
+        tools:ignore="RtlSymmetry" />
+
+
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
