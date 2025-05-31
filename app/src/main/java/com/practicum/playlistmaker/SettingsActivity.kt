@@ -38,7 +38,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         agreementIcon.setOnClickListener {
-            val url = "https://yandex.ru/legal/practicum_offer/"
+            val url = getString(R.string.offer_url)
             val agreeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(agreeIntent)
         }
