@@ -71,4 +71,12 @@
         <item name="android:textColor">?attr/colorOnSecondary</item>
         <item name="android:textColorHint">?attr/colorSecondaryVariant</item>
     </style>
+    <style name="SearchIcon">
+        <item name="android:layout_width">@dimen/radiusSize</item>
+        <item name="android:layout_height">@dimen/radiusSize</item>
+        <item name="android:layout_marginEnd">@dimen/edit_search</item>
+        <item name="android:src">@drawable/clear_button</item>
+        <item name="android:visibility">gone</item>
+        <item name="tint">?attr/colorSecondaryVariant</item>
+    </style>
 </resources>

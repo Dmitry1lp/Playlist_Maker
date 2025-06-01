@@ -44,15 +44,9 @@
 
     <ImageView
         android:id="@+id/clearIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_gravity="end|center"
-        android:paddingEnd="20dp"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
-        android:visibility="gone"
-        app:tint="@color/black"
+        android:layout_gravity="end|center_vertical"
+        android:src="@drawable/clear_button"
+        style="@style/SearchIcon"
         tools:ignore="RtlSymmetry" />
-
-
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

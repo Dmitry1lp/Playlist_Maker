@@ -21,17 +21,12 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-//        if (savedInstanceState != null) {
-//            countValue = savedInstanceState.getString(TEXT_SEARCH, TEXT_DEF)
-//        }
-
         val backButton = findViewById<MaterialToolbar>(R.id.toolbarSearch)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
         val inputEditText = findViewById<EditText>(R.id.inputEditText)
 
         inputEditText.addTextChangedListener {
-            countValue = it.toString()
-            clearButton.visibility = if (it.isNullOrEmpty()) View.GONE else View.VISIBLE
+            clearButton.visibility = if (it.toString().isNullOrEmpty())  View.GONE else View.VISIBLE
         }
 
         clearButton.setOnClickListener {
@@ -43,19 +38,19 @@ class SearchActivity : AppCompatActivity() {
             finish()
         }
 
-//        val simpleTextWatcher = object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                // empty
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                // empty
-//            }
-//
-//            override fun afterTextChanged(s: Editable?) {
-//                // empty
-//            }
-//        }
+        val simpleTextWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // empty
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // empty
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // empty
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -67,6 +62,14 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         // Вторым параметром мы передаём значение по умолчанию
         countValue = savedInstanceState.getString(TEXT_SEARCH, TEXT_DEF)
+    }
+
+    private fun clearButtonVisibility(s: CharSequence?): Int {
+        return if (s.isNullOrEmpty()) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
     }
 
     companion object {
