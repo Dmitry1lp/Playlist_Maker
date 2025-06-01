@@ -1,9 +1,12 @@
 package com.practicum.playlistmaker
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +20,7 @@ class SearchActivity : AppCompatActivity() {
 
     private var countValue: String = TEXT_DEF
 
+    @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
@@ -25,13 +29,13 @@ class SearchActivity : AppCompatActivity() {
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
         val inputEditText = findViewById<EditText>(R.id.inputEditText)
 
-        inputEditText.addTextChangedListener {
-            clearButton.visibility = if (it.toString().isNullOrEmpty())  View.GONE else View.VISIBLE
-        }
-
         clearButton.setOnClickListener {
             inputEditText.setText("")
             clearButton.visibility = View.GONE
+
+            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+            inputEditText.clearFocus()
         }
 
         backButton.setNavigationOnClickListener {
@@ -44,13 +48,19 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // empty
+                if (s.toString().isNullOrEmpty()) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
+                clearButton.visibility = clearButtonVisibility(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
                 // empty
             }
         }
+        inputEditText.addTextChangedListener(simpleTextWatcher)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -60,7 +70,6 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        // Вторым параметром мы передаём значение по умолчанию
         countValue = savedInstanceState.getString(TEXT_SEARCH, TEXT_DEF)
     }
 
