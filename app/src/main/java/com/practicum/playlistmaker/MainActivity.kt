@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         val mediaButton = findViewById<Button>(R.id.media)
         val settingsButton = findViewById<Button>(R.id.setting)
 
+
         searchButton.setOnClickListener{
             val searchIntent = Intent(this, SearchActivity::class.java)
             startActivity(searchIntent)
