@@ -11,5 +11,8 @@
     <string name="support" translatable="false">Написать в поддержку</string>
     <string name="offer_url" translatable="false">https://yandex.ru/legal/practicum_offer/</string>
     <string name="agreement" translatable="false">Пользовательское соглашение</string>
+    <string name="artist" translatable="false">Artist</string>
+    <string name="trackName" translatable="false">TrackName</string>
+    <string name="time" translatable="false">Time</string>
 
 </resources>
