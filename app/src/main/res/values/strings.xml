@@ -13,6 +13,6 @@
     <string name="agreement" translatable="false">Пользовательское соглашение</string>
     <string name="artist" translatable="false">Artist</string>
     <string name="trackName" translatable="false">TrackName</string>
-    <string name="time" translatable="false">Time</string>
+    <string name="time" translatable="false">5:55</string>
 
 </resources>
