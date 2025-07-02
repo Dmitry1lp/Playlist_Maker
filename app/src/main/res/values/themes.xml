@@ -6,6 +6,8 @@
         <item name="colorPrimaryVariant">@color/black</item>   <!-- Иконки -->
         <item name="colorOnPrimary">@color/white</item>             <!-- Белый  -->
         <item name="colorOnBackground">@color/track_off</item>
+        <item name="colorOnSurface">@color/light_search_bar</item>
+        <item name="colorOnPrimaryContainer">@color/black_light</item>
 
         <!-- Secondary -->
         <item name="colorSecondary">@color/white</item>          <!-- Белый -->

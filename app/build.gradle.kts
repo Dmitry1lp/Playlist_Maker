@@ -1,11 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
 }
 
 android {
     namespace = "com.practicum.playlistmaker"
     compileSdk = 35
+
+
 
     defaultConfig {
         applicationId = "com.practicum.playlistmaker"
@@ -36,7 +39,12 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.material.v161)
+    implementation(libs.glide)
+    implementation (libs.retrofit2.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.retrofit2.retrofit)
+    annotationProcessor(libs.compiler)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

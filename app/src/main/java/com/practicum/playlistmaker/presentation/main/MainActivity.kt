@@ -1,15 +1,13 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.practicum.playlistmaker.presentation.media.MediaActivity
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.presentation.search.SearchActivity
+import com.practicum.playlistmaker.presentation.setting.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         val searchButton = findViewById<Button>(R.id.search)
         val mediaButton = findViewById<Button>(R.id.media)
         val settingsButton = findViewById<Button>(R.id.setting)
+
 
         searchButton.setOnClickListener{
             val searchIntent = Intent(this, SearchActivity::class.java)
@@ -31,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         settingsButton.setOnClickListener {
-            val settingsIntent = Intent(this,SettingsActivity::class.java)
+            val settingsIntent = Intent(this, SettingsActivity::class.java)
             startActivity(settingsIntent)
         }
     }

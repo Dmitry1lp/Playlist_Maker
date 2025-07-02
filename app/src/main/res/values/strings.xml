@@ -11,5 +11,11 @@
     <string name="support" translatable="false">Написать в поддержку</string>
     <string name="offer_url" translatable="false">https://yandex.ru/legal/practicum_offer/</string>
     <string name="agreement" translatable="false">Пользовательское соглашение</string>
+    <string name="artist" translatable="false">Artist</string>
+    <string name="trackName" translatable="false">TrackName</string>
+    <string name="time" translatable="false">5:55</string>
+    <string name="not_found" translatable="false">Ничего не нашлось</string>
+    <string name="not_internet" translatable="false">Проблемы со связью\n\n Загрузка не удалась.Проверьте подключение к интернету</string>
+    <string name="refresh" translatable="false">Обновить</string>
 
 </resources>
