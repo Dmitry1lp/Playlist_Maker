@@ -1,11 +1,13 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation.track
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.data.network.request.Track
 
 class TrackAdapter(
-    private val tracks: List<Track>
+    private var tracks: List<Track>
 ): RecyclerView.Adapter<TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -19,5 +21,10 @@ class TrackAdapter(
 
     override fun getItemCount(): Int {
         return tracks.size
+    }
+
+    fun update(newTracks: List<Track>) {
+        tracks = newTracks
+        notifyDataSetChanged()
     }
 }
