@@ -13,4 +13,10 @@
     <dimen name="activity_search">48dp</dimen>
     <dimen name="edit_search">12dp</dimen>
     <dimen name="album">45dp</dimen>
+    <dimen name="search_not">19sp</dimen>
+    <dimen name="search_not_internet">24dp</dimen>
+    <dimen name="refresh_text">14sp</dimen>
+    <dimen name="refresh_padding_bot">24dp</dimen>
+    <dimen name="refresh_height">36dp</dimen>
+
 </resources>
