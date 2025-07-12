@@ -6,8 +6,9 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.practicum.playlistmaker.presentation.media.MediaActivity
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.presentation.search.SearchActivity
 import com.practicum.playlistmaker.presentation.setting.SettingsActivity
+import com.practicum.playlistmaker.presentation.search.SearchActivity
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

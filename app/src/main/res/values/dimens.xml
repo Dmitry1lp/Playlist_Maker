@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="medium_padding">8dp</dimen>
+    <dimen name="min_padding">5dp</dimen>
     <dimen name="primary_text_size">24sp</dimen>
     <dimen name="radiusSize">16dp</dimen>
+    <dimen name="group_text">11sp</dimen>
     <dimen name="setting_text">16sp</dimen>
     <dimen name="ic_padding">18dp</dimen>
     <dimen name="activity_text_size">22sp</dimen>
@@ -10,4 +12,12 @@
     <dimen name="activity_marginStart">10dp</dimen>
     <dimen name="activity_search">48dp</dimen>
     <dimen name="edit_search">12dp</dimen>
+    <dimen name="album">45dp</dimen>
+    <dimen name="search_not">19sp</dimen>
+    <dimen name="search_not_internet">24dp</dimen>
+    <dimen name="refresh_text">14sp</dimen>
+    <dimen name="refresh_padding_bot">24dp</dimen>
+    <dimen name="refresh_height">36dp</dimen>
+    <dimen name="night_padding">8dp</dimen>
+
 </resources>
