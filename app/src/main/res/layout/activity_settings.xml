@@ -22,20 +22,20 @@
 
 
     <!-- Темная тема -->
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/settingSwitch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:thumbTint="@color/selector_switch_thumb"
-        app:trackTint="@color/selector_switch_track"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="20dp"
-        style="@style/SettingText"
-        android:text="@string/dark_theme" />
 
 
     <!-- Поделиться -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/settingSwitch"
+        style="@style/SettingText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/radiusSize"
+        android:paddingVertical="@dimen/night_padding"
+        android:text="@string/dark_theme"
+        app:thumbTint="@color/selector_switch_thumb"
+        app:trackTint="@color/selector_switch_track" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

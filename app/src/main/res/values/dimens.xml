@@ -18,5 +18,6 @@
     <dimen name="refresh_text">14sp</dimen>
     <dimen name="refresh_padding_bot">24dp</dimen>
     <dimen name="refresh_height">36dp</dimen>
+    <dimen name="night_padding">20dp</dimen>
 
 </resources>

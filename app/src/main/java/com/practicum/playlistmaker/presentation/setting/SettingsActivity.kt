@@ -6,18 +6,23 @@ import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistmaker.R
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_settings)
 
         val backButton = findViewById<MaterialToolbar>(R.id.toolbarSetting)
         val shareIcon = findViewById<ImageView>(R.id.shareButton)
         val helpIcon = findViewById<ImageView>(R.id.helpButton)
         val agreementIcon = findViewById<ImageView>(R.id.agreementButton)
+        val settingSwitch = findViewById<SwitchMaterial>(R.id.settingSwitch)
+
+        settingSwitch.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
 
         shareIcon.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
