@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.data.network.api.iTunesAPI
 import com.practicum.playlistmaker.data.network.request.Track
@@ -40,7 +41,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val iTunesService = retrofit.create(iTunesAPI::class.java)
 
-    private val results = ArrayList<TrackDto>()
+    private val results = emptyList<TrackDto>()
 
     private var countValue: String = TEXT_DEF
 
@@ -58,73 +59,75 @@ class SearchActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         val placeholderNotFound = findViewById<LinearLayout>(R.id.placeholderNotFound)
         val placeholderNotInternet = findViewById<LinearLayout>(R.id.placeholderNotInternet)
+        val refreshButton = findViewById<MaterialButton>(R.id.mb_refresh)
 
-        Log.d("WeatherActivity", "1 вызван для:")
         trackAdapter = TrackAdapter(emptyList())
         recyclerView.adapter = trackAdapter
 
+        fun performSearch(searchText: String) {
+            iTunesService.search(searchText).enqueue(object: Callback<TrackResponse> {
+                override fun onResponse(
+                    call: Call<TrackResponse>,
+                    response: Response<TrackResponse>
+                ) {
+                    val body = response.body()
+                    if(response.isSuccessful && body != null){
+                        val trackList = body.results
 
-        Log.d("WeatherActivity", "2 вызван для:")
-        inputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                val searchText = inputEditText.text.toString()
-                Log.d("WeatherActivity", "3 вызван для:")
-                iTunesService.search(searchText).enqueue(object: Callback<TrackResponse> {
-                    override fun onResponse(
-                        call: Call<TrackResponse>,
-                        response: Response<TrackResponse>
-                    ) { Log.d("WeatherActivity", "4 вызван для:")
-                        if(response.isSuccessful && response.body() != null){
-                            val trackList = response.body()!!.results
+                        if (trackList.isNotEmpty()) {
 
-                            if (trackList.isNotEmpty()) {
-
-                            Log.d("WeatherActivity", "5 вызван для:${response.body()}")
                             recyclerView.visibility = View.VISIBLE
                             placeholderNotFound.visibility = View.GONE
                             placeholderNotInternet.visibility = View.GONE
 
-                            Log.d("WeatherActivity", "6 вызван для:")
                             val tracks = trackList.map{
-                                Log.d("WeatherActivity", "7 вызван для:")
                                 Track(
-                                trackName = it.trackName,
-                                artistName = it.artistName,
-                                trackTime = SimpleDateFormat("mm:ss", Locale.getDefault())
-                                    .format(it.trackTimeMillis),
-                                artworkUrl100 = it.artworkUrl100
-                            )
+                                    trackName = it.trackName,
+                                    artistName = it.artistName,
+                                    trackTime = SimpleDateFormat("mm:ss", Locale.getDefault())
+                                        .format(it.trackTimeMillis),
+                                    artworkUrl100 = it.artworkUrl100
+                                )
                             }
-                            Log.d("WeatherActivity", "8 вызван для:")
                             trackAdapter.update(tracks)
-                            Log.d("WeatherActivity", "9 вызван для:")
                             recyclerView.visibility = View.VISIBLE
-                                }else{
-                                Log.d("WeatherActivity", "10 вызван для:")
-                                placeholderNotFound.visibility = View.VISIBLE
-                                placeholderNotInternet.visibility = View.GONE
-                                recyclerView.visibility = View.GONE
-                            }
+                        }else{
+                            placeholderNotFound.visibility = View.VISIBLE
+                            placeholderNotInternet.visibility = View.GONE
+                            recyclerView.visibility = View.GONE
                         }
                     }
-
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        Log.d("WeatherActivity", "11 вызван для:")
-                        placeholderNotFound.visibility = View.GONE
-                        placeholderNotInternet.visibility = View.VISIBLE
-                        recyclerView.visibility = View.GONE
-                    }
-
                 }
-                )
+
+                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                    placeholderNotFound.visibility = View.GONE
+                    placeholderNotInternet.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+                }
+
+            })
+        }
+
+        inputEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                val searchText = inputEditText.text.toString()
+
+                performSearch(searchText)
                 true
+            } else {
+                false
             }
-            false
+        }
+
+        refreshButton.setOnClickListener {
+            val searchText = inputEditText.text.toString()
+            performSearch(searchText)
         }
 
         clearButton.setOnClickListener {
             inputEditText.setText("")
             clearButton.visibility = View.GONE
+            recyclerView.visibility = View.GONE
 
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(inputEditText.windowToken, 0)
@@ -175,7 +178,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val TEXT_SEARCH = "TEXT_SEARCH"
-        const val TEXT_DEF = ""
+        private const val TEXT_SEARCH = "TEXT_SEARCH"
+        private const val TEXT_DEF = ""
     }
 }

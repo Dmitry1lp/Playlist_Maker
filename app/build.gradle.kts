@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.glide)
     implementation (libs.retrofit2.retrofit)
     implementation (libs.converter.gson)
+    implementation (libs.material.v1110)
     implementation (libs.retrofit2.retrofit)
     annotationProcessor(libs.compiler)
     implementation(libs.androidx.core.ktx)

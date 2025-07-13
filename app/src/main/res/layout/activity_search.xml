@@ -28,7 +28,8 @@
         android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium_padding"
+        android:layout_marginStart="@dimen/radiusSize"
+        android:layout_marginEnd="@dimen/radiusSize"
         android:background="@drawable/search_bg"
         app:layout_constraintTop_toBottomOf="@id/toolbarSearch"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,6 +59,7 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="@dimen/radiusSize"
         app:layout_constraintTop_toBottomOf="@id/searchContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -121,12 +123,12 @@
             android:textColor="?attr/colorPrimaryVariant"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/mb_refresh"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/refresh_height"
             android:text="@string/refresh"
             android:background="@drawable/refresh_button"
             style="@style/RefreshIcon"
-
             />
 
     </LinearLayout>

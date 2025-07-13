@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistmaker.R
 
 class SettingsActivity : AppCompatActivity() {
@@ -18,6 +19,11 @@ class SettingsActivity : AppCompatActivity() {
         val shareIcon = findViewById<ImageView>(R.id.shareButton)
         val helpIcon = findViewById<ImageView>(R.id.helpButton)
         val agreementIcon = findViewById<ImageView>(R.id.agreementButton)
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.settingSwitch)
+
+//        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+//            (applicationContext as App).switchTheme(checked)
+//        }
 
         shareIcon.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
