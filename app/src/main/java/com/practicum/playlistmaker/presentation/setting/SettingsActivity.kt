@@ -21,9 +21,9 @@ class SettingsActivity : AppCompatActivity() {
         val agreementIcon = findViewById<ImageView>(R.id.agreementButton)
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.settingSwitch)
 
-//        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
-//            (applicationContext as App).switchTheme(checked)
-//        }
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
 
         shareIcon.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
