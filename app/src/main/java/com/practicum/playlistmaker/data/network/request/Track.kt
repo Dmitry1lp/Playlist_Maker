@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.data.network.request
 
 data class Track (
     val trackName: String, // Название композиции

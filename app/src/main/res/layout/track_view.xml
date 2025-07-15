@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="2dp"
-    android:paddingVertical="10dp"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
@@ -13,7 +13,6 @@
         android:layout_height="@dimen/album"
         android:layout_width="@dimen/album"
         android:src="@drawable/ic_placeholder"
-        android:paddingStart="@dimen/medium_padding"
         android:background="?attr/colorOnPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

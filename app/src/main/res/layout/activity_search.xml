@@ -5,7 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="?attr/colorOnPrimary"
     android:paddingBottom="@dimen/radiusSize">
 
@@ -29,7 +28,8 @@
         android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/medium_padding"
+        android:layout_marginStart="@dimen/radiusSize"
+        android:layout_marginEnd="@dimen/radiusSize"
         android:background="@drawable/search_bg"
         app:layout_constraintTop_toBottomOf="@id/toolbarSearch"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,6 +41,8 @@
         android:hint="@string/search"
         android:drawableStart="@drawable/search_icon"
         android:inputType="text"
+        android:imeOptions="actionDone"
+        android:singleLine="true"
         android:textCursorDrawable="@drawable/cursor"
         style="@style/SearchEText"
         tools:ignore="InefficientWeight,RtlSymmetry" />
@@ -57,10 +59,79 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="@dimen/radiusSize"
         app:layout_constraintTop_toBottomOf="@id/searchContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+    <LinearLayout
+        android:id="@+id/placeholderNotFound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_not_found"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/ys_display_medium"
+            android:textSize="@dimen/search_not"
+            android:text="@string/not_found"
+            android:paddingTop="@dimen/radiusSize"
+            android:textColor="?attr/colorPrimaryVariant"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/placeholderNotInternet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="@dimen/search_not_internet"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_not_internet"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:fontFamily="@font/ys_display_medium"
+            android:textSize="@dimen/search_not"
+            android:text="@string/not_internet"
+            android:paddingTop="@dimen/radiusSize"
+            android:paddingBottom="@dimen/refresh_padding_bot"
+            android:textColor="?attr/colorPrimaryVariant"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mb_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/refresh_height"
+            android:text="@string/refresh"
+            android:background="@drawable/refresh_button"
+            style="@style/RefreshIcon"
+            />
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
