@@ -76,9 +76,11 @@ class SearchActivity : AppCompatActivity() {
         // Инициализируем адаптер с пустым списком и назначаем его RecyclerView
         searchAdapter = TrackAdapter(emptyList()) { track ->
             searchHistory.addTrackHistory(track)
+            historyAdapter.update(searchHistory.getHistory())
         }
         historyAdapter = TrackAdapter(searchHistory.getHistory()) { track ->
             searchHistory.addTrackHistory(track)
+            historyAdapter.update(searchHistory.getHistory())
         }
         searchHistoryLayout.visibility = if (searchHistory.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
 
@@ -131,14 +133,14 @@ class SearchActivity : AppCompatActivity() {
         }
         // Обработка фокуса
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
-            searchHistoryLayout.visibility = if (hasFocus && inputEditText.text.isEmpty()) View.VISIBLE else View.GONE
+            searchHistoryLayout.visibility = if (hasFocus && inputEditText.text.isEmpty() && searchHistory.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
         }
         inputEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                searchHistoryLayout.visibility = if (inputEditText.hasFocus() && p0?.isEmpty() == true) View.VISIBLE else View.GONE
+                searchHistoryLayout.visibility = if (searchHistory.getHistory().isNotEmpty() && inputEditText.hasFocus() && p0?.isEmpty() == true) View.VISIBLE else View.GONE
             }
 
             override fun afterTextChanged(p0: Editable?) {
