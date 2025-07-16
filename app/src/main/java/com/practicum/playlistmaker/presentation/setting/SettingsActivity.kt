@@ -21,8 +21,12 @@ class SettingsActivity : AppCompatActivity() {
         val agreementIcon = findViewById<ImageView>(R.id.agreementButton)
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.settingSwitch)
 
+        val isDarkTheme = (applicationContext as App).darkTheme
+        themeSwitcher.isChecked = isDarkTheme
+
         themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
             (applicationContext as App).switchTheme(checked)
+
         }
 
         shareIcon.setOnClickListener {

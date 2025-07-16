@@ -19,5 +19,6 @@
     <dimen name="refresh_padding_bot">24dp</dimen>
     <dimen name="refresh_height">36dp</dimen>
     <dimen name="night_padding">8dp</dimen>
+    <dimen name="tv_search_history">32dp</dimen>
 
 </resources>
