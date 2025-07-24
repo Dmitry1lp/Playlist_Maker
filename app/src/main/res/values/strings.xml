@@ -19,5 +19,11 @@
     <string name="refresh" translatable="false">Обновить</string>
     <string name="history" translatable="false">Вы искали</string>
     <string name="clear_history" translatable="false">Очистить историю</string>
+    <string name="country" translatable="false">Страна</string>
+    <string name="genre" translatable="false">Жанр</string>
+    <string name="year" translatable="false">Год</string>
+    <string name="album" translatable="false">Альбом</string>
+    <string name="duration" translatable="false">Длительность</string>
+
 
 </resources>

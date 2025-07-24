@@ -3,7 +3,7 @@
     <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary -->
         <item name="colorPrimary">@color/backgroundMain</item>
-        <item name="colorPrimaryVariant">@color/black</item>
+        <item name="colorPrimaryVariant">@color/black_light</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorOnBackground">@color/track_off</item>
         <item name="colorOnSurface">@color/light_search_bar</item>
@@ -13,6 +13,8 @@
         <item name="colorSecondary">@color/white</item>
         <item name="colorSecondaryVariant">@color/light_search_bar</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="android:textColorPrimary">@color/light_search_bar</item>
+
 
         <!-- Система -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
