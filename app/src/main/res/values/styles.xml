@@ -56,8 +56,31 @@
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:textSize">@dimen/setting_text</item>
         <item name="android:gravity">center_vertical</item>
-
     </style>
+    <style name="AudioTextView1">
+        <item name="android:textColor">@color/light_search_bar</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/audio_text_size</item>
+        <item name="android:gravity">start</item>
+    </style>
+    <style name="AudioTextView2">
+        <item name="android:textColor">?attr/colorPrimaryVariant</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/audio_text_size</item>
+        <item name="android:gravity">end</item>
+    </style>
+    <style name="TextViewTime">
+        <item name="android:textColor">?attr/colorPrimaryVariant</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">@dimen/refresh_text</item>
+    </style>
+
+    <style name="TextViewTrack">
+        <item name="android:textColor">?attr/colorPrimaryVariant</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">@dimen/activity_text_size</item>
+    </style>
+
     <style name="SearchEText">
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:layout_width">match_parent</item>
