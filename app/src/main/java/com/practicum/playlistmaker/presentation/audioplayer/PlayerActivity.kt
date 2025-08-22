@@ -175,21 +175,12 @@ class PlayerActivity : AppCompatActivity() {
     private fun updateTimeIndicator(): Runnable {
         return object : Runnable {
             override fun run() {
-                // Сколько прошло времени с момента запуска
-                val elapsedTime = mediaPlayer.currentPosition.toLong()
-                // Сколько осталось до конца
-                val remainingTime = durationMillis - elapsedTime
-
-                if(remainingTime > 0) {
-                    val seconds = elapsedTime / REFRESH_DELAY_MILLIS
-                    audioTimeIndicator?.text = String.format("%02d:%02d", seconds / 60, seconds % 60)
-                    timerHandler?.postDelayed(this,REFRESH_DELAY_MILLIS)
-                } else {
-                    val sdf = SimpleDateFormat("m:ss", Locale.getDefault())
-                    val date = Date(0)
-                    audioTimeIndicator?.text = sdf.format(date)
-                    playerState = STATE_PREPARED
-                    playerPlayButton.setImageResource(R.drawable.play_button)
+                if (mediaPlayer.isPlaying) {
+                    val elapsedTime = mediaPlayer.currentPosition
+                    val minutes = (elapsedTime / 1000) / 60
+                    val seconds = (elapsedTime / 1000) % 60
+                    audioTimeIndicator?.text = String.format("%02d:%02d", minutes, seconds)
+                    timerHandler?.postDelayed(this, REFRESH_DELAY_MILLIS)
                 }
             }
         }
