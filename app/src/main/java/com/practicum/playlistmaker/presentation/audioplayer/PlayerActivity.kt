@@ -16,13 +16,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.data.network.request.Track
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 class PlayerActivity : AppCompatActivity() {
 
 
     private var isLiked = false
-
     private var timerHandler: Handler? = null
     private var playerState = STATE_DEFAULT
     private var urlTrack : String? = null
@@ -31,7 +33,6 @@ class PlayerActivity : AppCompatActivity() {
     private var mediaPlayer = MediaPlayer()
     private var durationMillis: Long = 0L
     private var currentPosition: Long = 0L
-    private var playTrackStartTime: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,7 +159,9 @@ class PlayerActivity : AppCompatActivity() {
         }
         mediaPlayer.setOnCompletionListener {
             playerState = STATE_PREPARED
-            audioTimeIndicator.text = "00:00"
+            val sdf = SimpleDateFormat("m:ss", Locale.getDefault())
+            val date = Date(0)
+            audioTimeIndicator?.text = sdf.format(date)
             currentPosition = 0L
             timerHandler?.removeCallbacksAndMessages(null)
             playerPlayButton.setImageResource(R.drawable.play_button)
@@ -166,7 +169,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun startTimeIndicator() {
-        playTrackStartTime = System.currentTimeMillis() - currentPosition
         timerHandler?.post(updateTimeIndicator())
     }
 
@@ -174,7 +176,7 @@ class PlayerActivity : AppCompatActivity() {
         return object : Runnable {
             override fun run() {
                 // Сколько прошло времени с момента запуска
-                val elapsedTime = System.currentTimeMillis() - playTrackStartTime
+                val elapsedTime = mediaPlayer.currentPosition.toLong()
                 // Сколько осталось до конца
                 val remainingTime = durationMillis - elapsedTime
 
@@ -183,7 +185,9 @@ class PlayerActivity : AppCompatActivity() {
                     audioTimeIndicator?.text = String.format("%02d:%02d", seconds / 60, seconds % 60)
                     timerHandler?.postDelayed(this,REFRESH_DELAY_MILLIS)
                 } else {
-                    audioTimeIndicator.text = "0:00"
+                    val sdf = SimpleDateFormat("m:ss", Locale.getDefault())
+                    val date = Date(0)
+                    audioTimeIndicator?.text = sdf.format(date)
                     playerState = STATE_PREPARED
                     playerPlayButton.setImageResource(R.drawable.play_button)
                 }

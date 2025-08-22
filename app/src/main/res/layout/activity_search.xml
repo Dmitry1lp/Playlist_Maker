@@ -24,6 +24,7 @@
         android:id="@+id/toolbarSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:titleTextColor="?attr/colorOnPrimaryContainer"
         style="@style/SettingText"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -60,6 +60,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
+
+
     @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +69,6 @@ class SearchActivity : AppCompatActivity() {
 
         mainThreadHandler = Handler(Looper.getMainLooper())
         clickHandler = Handler(Looper.getMainLooper())
-
 
         val sharedPrefs = getSharedPreferences("history_prefs", MODE_PRIVATE)
         val searchHistory = SearchHistory(sharedPrefs)
@@ -90,7 +91,7 @@ class SearchActivity : AppCompatActivity() {
             historyAdapter.update(searchHistory.getHistory())
             if(clickDebounce()) {
                 val playerIntent = Intent(this, PlayerActivity::class.java)
-                playerIntent.putExtra("KEY_TRACK", track)
+                playerIntent.putExtra(KEY, track)
                 startActivity(playerIntent)
             }
         }
@@ -262,6 +263,7 @@ class SearchActivity : AppCompatActivity() {
     }
     companion object {
         private const val TEXT_SEARCH = "TEXT_SEARCH"
+        private const val KEY = "KEY_TRACK"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
