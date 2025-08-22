@@ -4,15 +4,19 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
@@ -47,10 +51,11 @@ class SearchActivity : AppCompatActivity() {
         .build()
 
     private val iTunesService = retrofit.create(iTunesAPI::class.java)
-
     private val results = emptyList<TrackDto>()
-
-    private var countValue: String = TEXT_DEF
+    private var mainThreadHandler: Handler? = null
+    private var clickHandler: Handler? = null
+    private var searchText: String = ""
+    private var isClickAllowed = true
 
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
@@ -59,6 +64,10 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        mainThreadHandler = Handler(Looper.getMainLooper())
+        clickHandler = Handler(Looper.getMainLooper())
+
 
         val sharedPrefs = getSharedPreferences("history_prefs", MODE_PRIVATE)
         val searchHistory = SearchHistory(sharedPrefs)
@@ -73,15 +82,18 @@ class SearchActivity : AppCompatActivity() {
         val placeholderNotInternet = findViewById<LinearLayout>(R.id.placeholderNotInternet)
         val refreshButton = findViewById<MaterialButton>(R.id.mb_refresh)
         val clearHistoryButton = findViewById<MaterialButton>(R.id.mb_clear)
+        val progressBar = findViewById<ProgressBar>(R.id.pb_progressBar)
 
+        //Клик по треку
         val onClickTrack: (Track) -> Unit = { track ->
             searchHistory.addTrackHistory(track)
             historyAdapter.update(searchHistory.getHistory())
-            val playerIntent = Intent(this, PlayerActivity::class.java)
-            playerIntent.putExtra("KEY_TRACK", track)
-            startActivity(playerIntent)
+            if(clickDebounce()) {
+                val playerIntent = Intent(this, PlayerActivity::class.java)
+                playerIntent.putExtra("KEY_TRACK", track)
+                startActivity(playerIntent)
+            }
         }
-
         // Инициализируем адаптер с пустым списком и назначаем его RecyclerView
         searchAdapter = TrackAdapter(emptyList(), onClickTrack)
 
@@ -93,11 +105,20 @@ class SearchActivity : AppCompatActivity() {
 
         // Поиск по введенному тексту
         fun performSearch(searchText: String) {
+            if (searchText.isEmpty()) {
+                progressBar.visibility = View.GONE
+                recyclerView.visibility = View.GONE
+                placeholderNotFound.visibility = View.GONE
+                placeholderNotInternet.visibility = View.GONE
+                return
+            }
+            progressBar.visibility = View.VISIBLE
             iTunesService.search(searchText).enqueue(object: Callback<TrackResponse> {
                 override fun onResponse(
                     call: Call<TrackResponse>,
                     response: Response<TrackResponse>
                 ) {
+                    progressBar.visibility = View.GONE
                     val body = response.body()
                     if(response.isSuccessful && body != null){
                         val trackList = body.results
@@ -120,6 +141,7 @@ class SearchActivity : AppCompatActivity() {
 
                                 Track(
                                     trackId = it.trackId,
+                                    previewUrl = it.previewUrl,
                                     collectionName = it.collectionName,
                                     primaryGenreName = it.primaryGenreName,
                                     country = it.country,
@@ -142,27 +164,39 @@ class SearchActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                    progressBar.visibility = View.GONE
                     placeholderNotFound.visibility = View.GONE
                     placeholderNotInternet.visibility = View.VISIBLE
                     recyclerView.visibility = View.GONE
                 }
-
             })
+        }
+        val searchRunnable = Runnable { performSearch(searchText) }
+
+        fun searchDebounce() {
+            mainThreadHandler?.removeCallbacks(searchRunnable)
+            if(searchText.isNotEmpty()) {
+                mainThreadHandler?.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+            } else {
+                recyclerView.visibility = View.GONE
+                placeholderNotFound.visibility = View.GONE
+                placeholderNotInternet.visibility = View.GONE
+            }
         }
         // Обработка фокуса
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
             searchHistoryLayout.visibility = if (hasFocus && inputEditText.text.isEmpty() && searchHistory.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
         }
         inputEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                searchHistoryLayout.visibility = if (searchHistory.getHistory().isNotEmpty() && inputEditText.hasFocus() && p0?.isEmpty() == true) View.VISIBLE else View.GONE
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchText = s.toString()
+                clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                searchHistoryLayout.visibility = if (searchHistory.getHistory().isNotEmpty() && inputEditText.hasFocus() && s?.isEmpty() == true) View.VISIBLE else View.GONE
+                searchDebounce()
             }
-
-            override fun afterTextChanged(p0: Editable?) {
-            }
+            override fun afterTextChanged(s: Editable?) {}
         })
         // Обработка нажатия на кнопку "Ввод"
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -190,6 +224,7 @@ class SearchActivity : AppCompatActivity() {
             inputEditText.setText("")
             clearButton.visibility = View.GONE
             placeholderNotInternet.visibility = View.GONE
+            placeholderNotFound.visibility = View.GONE
             recyclerView.visibility = View.GONE
             // Прячем клавиатуру и убираем фокус
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -200,42 +235,34 @@ class SearchActivity : AppCompatActivity() {
         backButton.setNavigationOnClickListener {
             finish()
         }
-
-        val simpleTextWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-            // Показываем кнопку очистки, если текст не пустой, иначе скрываем
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.toString().isNullOrEmpty()) {
-                    View.GONE
-                } else {
-                    View.VISIBLE
-                }
-                clearButton.visibility = clearButtonVisibility(s)
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-            }
-        }
-        inputEditText.addTextChangedListener(simpleTextWatcher)
     }
     // Сохраняем состояние поиска при повороте экрана
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(TEXT_SEARCH, countValue)
+        outState.putString(TEXT_SEARCH, searchText)
     }
     // Восстанавливаем состояние поиска
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        countValue = savedInstanceState.getString(TEXT_SEARCH, TEXT_DEF)
+        searchText = savedInstanceState.getString(TEXT_SEARCH, "")
+        findViewById<EditText>(R.id.inputEditText).setText(searchText)
     }
     // Видимость кнопки очистки
     private fun clearButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) View.GONE  else  View.VISIBLE
     }
-
+    //Дебаунс кликов по треку
+    fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            clickHandler?.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
     companion object {
         private const val TEXT_SEARCH = "TEXT_SEARCH"
-        private const val TEXT_DEF = ""
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }
