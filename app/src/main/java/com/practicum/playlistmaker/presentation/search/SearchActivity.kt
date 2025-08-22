@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.presentation.search
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -23,6 +24,7 @@ import com.practicum.playlistmaker.data.network.request.Track
 import com.practicum.playlistmaker.data.network.response.TrackDto
 import com.practicum.playlistmaker.data.network.response.TrackResponse
 import com.practicum.playlistmaker.data.storage.SearchHistory
+import com.practicum.playlistmaker.presentation.audioplayer.PlayerActivity
 import com.practicum.playlistmaker.presentation.track.TrackAdapter
 import retrofit2.Call
 import retrofit2.Callback
@@ -31,6 +33,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 class SearchActivity : AppCompatActivity() {
 
@@ -52,8 +55,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
-
-
     @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,15 +74,18 @@ class SearchActivity : AppCompatActivity() {
         val refreshButton = findViewById<MaterialButton>(R.id.mb_refresh)
         val clearHistoryButton = findViewById<MaterialButton>(R.id.mb_clear)
 
+        val onClickTrack: (Track) -> Unit = { track ->
+            searchHistory.addTrackHistory(track)
+            historyAdapter.update(searchHistory.getHistory())
+            val playerIntent = Intent(this, PlayerActivity::class.java)
+            playerIntent.putExtra("KEY_TRACK", track)
+            startActivity(playerIntent)
+        }
+
         // Инициализируем адаптер с пустым списком и назначаем его RecyclerView
-        searchAdapter = TrackAdapter(emptyList()) { track ->
-            searchHistory.addTrackHistory(track)
-            historyAdapter.update(searchHistory.getHistory())
-        }
-        historyAdapter = TrackAdapter(searchHistory.getHistory()) { track ->
-            searchHistory.addTrackHistory(track)
-            historyAdapter.update(searchHistory.getHistory())
-        }
+        searchAdapter = TrackAdapter(emptyList(), onClickTrack)
+
+        historyAdapter = TrackAdapter(searchHistory.getHistory(), onClickTrack)
         searchHistoryLayout.visibility = if (searchHistory.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
 
         recyclerView.adapter = searchAdapter
@@ -104,8 +108,22 @@ class SearchActivity : AppCompatActivity() {
                             placeholderNotInternet.visibility = View.GONE
 
                             val tracks = trackList.map{
+                                val releaseDateTrack = try {
+                                    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+                                    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+                                    val date = dateFormat.parse(it.releaseDate ?: "")
+                                    val formatter = SimpleDateFormat("yyyy", Locale.getDefault())
+                                    formatter.format(date ?: "")
+                                } catch (e: Exception) {
+                                    ""
+                                }
+
                                 Track(
                                     trackId = it.trackId,
+                                    collectionName = it.collectionName,
+                                    primaryGenreName = it.primaryGenreName,
+                                    country = it.country,
+                                    releaseDate = releaseDateTrack,
                                     trackName = it.trackName,
                                     artistName = it.artistName,
                                     trackTime = SimpleDateFormat("mm:ss", Locale.getDefault())
@@ -171,6 +189,7 @@ class SearchActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             inputEditText.setText("")
             clearButton.visibility = View.GONE
+            placeholderNotInternet.visibility = View.GONE
             recyclerView.visibility = View.GONE
             // Прячем клавиатуру и убираем фокус
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager

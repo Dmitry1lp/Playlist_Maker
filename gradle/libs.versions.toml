@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.3"
+agp = "8.11.1"
 glide = "4.14.2"
 googleMaterial = "1.6.1"
 googleMaterialVersion = "1.11.0"

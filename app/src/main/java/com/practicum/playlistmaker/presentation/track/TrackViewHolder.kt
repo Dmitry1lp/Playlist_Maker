@@ -16,7 +16,6 @@ import java.util.Locale
 
 class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
-    val trackLayout: ConstraintLayout =  itemView.findViewById(R.id.trackLayout)
     val trackAlbum: ImageView = itemView.findViewById(R.id.album)
     val trackName: TextView = itemView.findViewById(R.id.trackName)
     val trackGroup: TextView = itemView.findViewById(R.id.trackGroup)
