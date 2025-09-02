@@ -6,6 +6,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Track (
     val trackId: Long, //ID
+    val previewUrl: String?, // Ссылка превью
     val collectionName: String?, //Название альбома
     val releaseDate: String?, // Год
     val primaryGenreName: String?, //Жанр

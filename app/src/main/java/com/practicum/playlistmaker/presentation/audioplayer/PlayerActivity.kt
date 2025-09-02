@@ -1,32 +1,46 @@
 package com.practicum.playlistmaker.presentation.audioplayer
 
 import android.content.Context
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.TypedValue
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.os.postDelayed
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.data.network.request.Track
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 
 class PlayerActivity : AppCompatActivity() {
 
-    private var isPlaying = false
-    private var isLiked = false
 
+    private var isLiked = false
+    private var timerHandler: Handler? = null
+    private var playerState = STATE_DEFAULT
+    private var urlTrack : String? = null
+    private lateinit var audioTimeIndicator : TextView
+    private lateinit var playerPlayButton: ImageButton
+    private var mediaPlayer = MediaPlayer()
+    private var durationMillis: Long = 0L
+    private var currentPosition: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioplayer)
 
+        audioTimeIndicator = findViewById(R.id.tv_time_indicator)
+        playerPlayButton = findViewById(R.id.ib_play_button)
         val playerBackButton = findViewById<ImageButton>(R.id.iv_back_button)
-        val playerPlayButton = findViewById<ImageButton>(R.id.ib_play_button)
         val likeButton = findViewById<ImageButton>(R.id.ib_like_button)
         val audioAlbumImage = findViewById<ImageView>(R.id.iv_album)
         val audioTrackName = findViewById<TextView>(R.id.tv_trackName)
@@ -36,7 +50,9 @@ class PlayerActivity : AppCompatActivity() {
         val audioYear = findViewById<TextView>(R.id.tv_year)
         val audioGenre = findViewById<TextView>(R.id.tv_genre)
         val audioCountry = findViewById<TextView>(R.id.tv_country)
-        val audioTimeIndicator = findViewById<TextView>(R.id.tv_time_indicator)
+
+
+        timerHandler = Handler(Looper.getMainLooper())
 
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("KEY_TRACK", Track::class.java)
@@ -45,6 +61,7 @@ class PlayerActivity : AppCompatActivity() {
             intent.getParcelableExtra<Track>("KEY_TRACK")
         }
 
+        urlTrack = track?.previewUrl
         audioCountry.text = track?.country
         audioGenre.text = track?.primaryGenreName
         audioYear.text = track?.releaseDate
@@ -69,6 +86,12 @@ class PlayerActivity : AppCompatActivity() {
             .transform(RoundedCorners(radiusView))
             .into(audioAlbumImage)
 
+        //Переменная с длительностью
+        val trackTimeString = track?.trackTime
+        val parts = trackTimeString?.split(":")
+        val minutes = parts?.getOrNull(0)?.toLongOrNull() ?: 0L
+        val seconds = parts?.getOrNull(1)?.toLongOrNull() ?: 0L
+        durationMillis = (minutes * 60 + seconds) * 1000
 
         //Обработка нажатия кнопки Назад
         playerBackButton.setOnClickListener {
@@ -76,12 +99,7 @@ class PlayerActivity : AppCompatActivity() {
         }
         //Обработка нажатия кнопки Play
         playerPlayButton.setOnClickListener {
-            isPlaying = !isPlaying
-            if (isPlaying) {
-                playerPlayButton.setImageResource(R.drawable.paused_button)
-            } else {
-                playerPlayButton.setImageResource(R.drawable.play_button)
-            }
+            playbackControl()
         }
         //Обработка нажатия кнопки Like
         likeButton.setOnClickListener {
@@ -92,5 +110,87 @@ class PlayerActivity : AppCompatActivity() {
                 likeButton.setImageResource(R.drawable.like_button)
             }
         }
+        preparePlayer()
+    }
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+        timerHandler?.removeCallbacksAndMessages(null)
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+        timerHandler?.removeCallbacksAndMessages(null)
+    }
+    private fun playbackControl() {
+        when(playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+    private fun startPlayer() {
+        mediaPlayer.start()
+        startTimeIndicator()
+        if (currentPosition > 0) {
+            mediaPlayer.seekTo(currentPosition.toInt())
+        }
+        playerPlayButton.setImageResource(R.drawable.paused_button)
+        playerState = STATE_PLAYING
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        playerPlayButton.setImageResource(R.drawable.play_button)
+        playerState = STATE_PAUSED
+        currentPosition = mediaPlayer?.currentPosition?.toLong() ?: 0L
+        timerHandler?.removeCallbacksAndMessages(null)
+    }
+
+    private fun preparePlayer() {
+        mediaPlayer.setDataSource(urlTrack)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+            playerPlayButton.isEnabled = true
+            playerState = STATE_PREPARED
+        }
+        mediaPlayer.setOnCompletionListener {
+            playerState = STATE_PREPARED
+            val sdf = SimpleDateFormat("m:ss", Locale.getDefault())
+            val date = Date(0)
+            audioTimeIndicator?.text = sdf.format(date)
+            currentPosition = 0L
+            timerHandler?.removeCallbacksAndMessages(null)
+            playerPlayButton.setImageResource(R.drawable.play_button)
+        }
+    }
+
+    private fun startTimeIndicator() {
+        timerHandler?.post(updateTimeIndicator())
+    }
+
+    private fun updateTimeIndicator(): Runnable {
+        return object : Runnable {
+            override fun run() {
+                if (mediaPlayer.isPlaying) {
+                    val elapsedTime = mediaPlayer.currentPosition
+                    val minutes = (elapsedTime / 1000) / 60
+                    val seconds = (elapsedTime / 1000) % 60
+                    audioTimeIndicator?.text = String.format("%02d:%02d", minutes, seconds)
+                    timerHandler?.postDelayed(this, REFRESH_DELAY_MILLIS)
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val REFRESH_DELAY_MILLIS = 1000L
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
     }
 }
