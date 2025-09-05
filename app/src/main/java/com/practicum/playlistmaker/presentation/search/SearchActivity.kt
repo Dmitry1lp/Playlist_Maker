@@ -38,12 +38,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
-    @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val getSearchHistoryInteractor = Creator.provideSearchHistoryInteractor(getSharedPreferences("history_prefs", MODE_PRIVATE))
+        val getSearchHistoryInteractor = Creator.provideSearchHistoryInteractor(this)
 
         mainThreadHandler = Handler(Looper.getMainLooper())
         clickHandler = Handler(Looper.getMainLooper())

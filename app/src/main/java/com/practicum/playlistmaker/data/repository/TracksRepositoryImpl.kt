@@ -7,6 +7,7 @@ import com.practicum.playlistmaker.domain.repository.TracksRepository
 import com.practicum.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 class TracksRepositoryImpl (private val networkClient: NetworkClient) : TracksRepository {
 
@@ -14,11 +15,21 @@ class TracksRepositoryImpl (private val networkClient: NetworkClient) : TracksRe
         val response = networkClient.doRequest(TracksSearchRequest(expression))
         if (response.resultCode == 200) {
             return (response as TracksSearchResponse).results.map {
+                val releaseDateTrack = try {
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+                    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+                    val date = dateFormat.parse(it.releaseDate ?: "")
+                    val formatter = SimpleDateFormat("yyyy", Locale.getDefault())
+                    formatter.format(date ?: "")
+                } catch (e: Exception) {
+                    ""
+                }
+
                 Track(
                     trackId = it.trackId,
                     previewUrl = it.previewUrl,
                     collectionName = it.collectionName,
-                    releaseDate = it.releaseDate,
+                    releaseDate = releaseDateTrack,
                     primaryGenreName = it.primaryGenreName,
                     country = it.country,
                     trackName = it.trackName,

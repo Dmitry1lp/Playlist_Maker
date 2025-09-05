@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.creator
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.practicum.playlistmaker.data.repository.TracksRepositoryImpl
 import com.practicum.playlistmaker.data.network.client.RetrofitNetworkClient
@@ -15,6 +16,7 @@ object Creator {
     private fun getTracksRepository(): TracksRepository {
         return TracksRepositoryImpl(RetrofitNetworkClient())
     }
+
     private fun getSearchHistoryRepository(sharedPrefs: SharedPreferences): SearchHistoryRepository {
         return SearchHistoryRepositoryImpl(sharedPrefs)
     }
@@ -23,8 +25,9 @@ object Creator {
         return TracksInteractorImpl(getTracksRepository())
     }
 
-    fun provideSearchHistoryInteractor(sharedPrefs: SharedPreferences): SearchHistoryInteractor {
-        return SearchHistoryInteractorImpl(getSearchHistoryRepository(sharedPrefs))
+    fun provideSearchHistoryInteractor(context: Context): SearchHistoryInteractor {
+        val sharedPreferences = context.getSharedPreferences("history_prefs", Context.MODE_PRIVATE)
+        return SearchHistoryInteractorImpl(getSearchHistoryRepository(sharedPreferences))
     }
 
 }
