@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.data.network.response
+package com.practicum.playlistmaker.data.dto
 
 data class TrackDto(val trackId: Long,
                     val previewUrl: String?,

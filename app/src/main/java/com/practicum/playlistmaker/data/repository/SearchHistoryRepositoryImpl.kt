@@ -1,36 +1,38 @@
-package com.practicum.playlistmaker.data.storage
+package com.practicum.playlistmaker.data.repository
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.practicum.playlistmaker.data.network.request.Track
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.domain.repository.SearchHistoryRepository
 
-class SearchHistory(private val sharedPrefs: SharedPreferences) {
+class SearchHistoryRepositoryImpl(private val sharedPrefs: SharedPreferences):
+    SearchHistoryRepository {
 
     val gson = Gson()
 
-    fun saveHistory(track: List<Track>) {
+    private fun saveHistory(track: List<Track>) {
         val json = gson.toJson(track)
         sharedPrefs.edit()
             .putString(KEY_SEARCH_HISTORY,json)
             .apply()
     }
 
-    fun getHistory(): List<Track> {
+    override fun getHistory(): List<Track> {
         val json = sharedPrefs.getString(KEY_SEARCH_HISTORY, null) ?: return emptyList()
         val type = object: TypeToken<List<Track>>() {}.type
         return gson.fromJson(json, type)
     }
 
-    fun clearTrackHistory() {
+    override fun clearTrackHistory() {
         sharedPrefs.edit()
             .remove(KEY_SEARCH_HISTORY)
             .apply()
     }
 
     @SuppressLint("NewApi")
-    fun addTrackHistory(track: Track){
+    override fun addTrackHistory(track: Track){
         val historyList = getHistory().toMutableList().apply() {
 
             removeAll { it.trackId == track.trackId }
