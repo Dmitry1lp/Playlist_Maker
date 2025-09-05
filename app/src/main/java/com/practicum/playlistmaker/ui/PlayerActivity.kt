@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.presentation.audioplayer
+package com.practicum.playlistmaker.ui
 
 import android.content.Context
 import android.media.MediaPlayer
@@ -11,11 +11,10 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.postDelayed
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.data.network.request.Track
+import com.practicum.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

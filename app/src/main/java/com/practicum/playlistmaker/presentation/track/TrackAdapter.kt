@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.data.network.request.Track
+import com.practicum.playlistmaker.domain.models.Track
 
 class TrackAdapter(
     private var tracks: List<Track>,
