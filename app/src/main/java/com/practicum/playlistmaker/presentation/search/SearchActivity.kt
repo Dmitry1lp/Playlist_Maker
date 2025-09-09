@@ -8,11 +8,9 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -23,55 +21,31 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.data.network.api.iTunesAPI
-import com.practicum.playlistmaker.data.network.request.Track
-import com.practicum.playlistmaker.data.network.response.TrackDto
-import com.practicum.playlistmaker.data.network.response.TrackResponse
-import com.practicum.playlistmaker.data.storage.SearchHistory
-import com.practicum.playlistmaker.presentation.audioplayer.PlayerActivity
+import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.domain.interactor.TracksInteractor
 import com.practicum.playlistmaker.presentation.track.TrackAdapter
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
+import com.practicum.playlistmaker.ui.PlayerActivity
 
 class SearchActivity : AppCompatActivity() {
 
-    // Базовый URL для API iTunes
-    private val iTunesBaseUrl = "https://itunes.apple.com"
-
-    // Инициализация Retrofit для сетевых запросов
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(iTunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val iTunesService = retrofit.create(iTunesAPI::class.java)
-    private val results = emptyList<TrackDto>()
     private var mainThreadHandler: Handler? = null
     private var clickHandler: Handler? = null
     private var searchText: String = ""
     private var isClickAllowed = true
+    private val getTracksInteractor = Creator.provideTracksInteractor()
 
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
-
-
-    @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        val getSearchHistoryInteractor = Creator.provideSearchHistoryInteractor(this)
+
         mainThreadHandler = Handler(Looper.getMainLooper())
         clickHandler = Handler(Looper.getMainLooper())
-
-        val sharedPrefs = getSharedPreferences("history_prefs", MODE_PRIVATE)
-        val searchHistory = SearchHistory(sharedPrefs)
 
         val backButton = findViewById<MaterialToolbar>(R.id.toolbarSearch)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
@@ -84,11 +58,10 @@ class SearchActivity : AppCompatActivity() {
         val refreshButton = findViewById<MaterialButton>(R.id.mb_refresh)
         val clearHistoryButton = findViewById<MaterialButton>(R.id.mb_clear)
         val progressBar = findViewById<ProgressBar>(R.id.pb_progressBar)
-
         //Клик по треку
         val onClickTrack: (Track) -> Unit = { track ->
-            searchHistory.addTrackHistory(track)
-            historyAdapter.update(searchHistory.getHistory())
+            getSearchHistoryInteractor.addTrackHistory(track)
+            historyAdapter.update(getSearchHistoryInteractor.getHistory())
             if(clickDebounce()) {
                 val playerIntent = Intent(this, PlayerActivity::class.java)
                 playerIntent.putExtra(KEY, track)
@@ -98,8 +71,8 @@ class SearchActivity : AppCompatActivity() {
         // Инициализируем адаптер с пустым списком и назначаем его RecyclerView
         searchAdapter = TrackAdapter(emptyList(), onClickTrack)
 
-        historyAdapter = TrackAdapter(searchHistory.getHistory(), onClickTrack)
-        searchHistoryLayout.visibility = if (searchHistory.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
+        historyAdapter = TrackAdapter(getSearchHistoryInteractor.getHistory(), onClickTrack)
+        searchHistoryLayout.visibility = if (getSearchHistoryInteractor.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
 
         recyclerView.adapter = searchAdapter
         recyclerViewHistory.adapter = historyAdapter
@@ -114,61 +87,21 @@ class SearchActivity : AppCompatActivity() {
                 return
             }
             progressBar.visibility = View.VISIBLE
-            iTunesService.search(searchText).enqueue(object: Callback<TrackResponse> {
-                override fun onResponse(
-                    call: Call<TrackResponse>,
-                    response: Response<TrackResponse>
-                ) {
-                    progressBar.visibility = View.GONE
-                    val body = response.body()
-                    if(response.isSuccessful && body != null){
-                        val trackList = body.results
-
-                        if (trackList.isNotEmpty()) {// Если треки найдены
+            getTracksInteractor.searchTrack(searchText, object : TracksInteractor.TracksConsumer {
+                override fun consume(foundTracks: List<Track>) {
+                    mainThreadHandler?.post {
+                        progressBar.visibility = View.GONE
+                        if (foundTracks.isNotEmpty()) {
                             recyclerView.visibility = View.VISIBLE
                             placeholderNotFound.visibility = View.GONE
                             placeholderNotInternet.visibility = View.GONE
-
-                            val tracks = trackList.map{
-                                val releaseDateTrack = try {
-                                    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
-                                    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-                                    val date = dateFormat.parse(it.releaseDate ?: "")
-                                    val formatter = SimpleDateFormat("yyyy", Locale.getDefault())
-                                    formatter.format(date ?: "")
-                                } catch (e: Exception) {
-                                    ""
-                                }
-
-                                Track(
-                                    trackId = it.trackId,
-                                    previewUrl = it.previewUrl,
-                                    collectionName = it.collectionName,
-                                    primaryGenreName = it.primaryGenreName,
-                                    country = it.country,
-                                    releaseDate = releaseDateTrack,
-                                    trackName = it.trackName,
-                                    artistName = it.artistName,
-                                    trackTime = SimpleDateFormat("mm:ss", Locale.getDefault())
-                                        .format(it.trackTimeMillis),
-                                    artworkUrl100 = it.artworkUrl100
-                                )
-                            }
-                            searchAdapter.update(tracks)
-                            recyclerView.visibility = View.VISIBLE
-                        }else{// Если трек не найден
+                            searchAdapter.update(foundTracks)
+                        } else {
                             placeholderNotFound.visibility = View.VISIBLE
                             placeholderNotInternet.visibility = View.GONE
                             recyclerView.visibility = View.GONE
                         }
                     }
-                }
-
-                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                    progressBar.visibility = View.GONE
-                    placeholderNotFound.visibility = View.GONE
-                    placeholderNotInternet.visibility = View.VISIBLE
-                    recyclerView.visibility = View.GONE
                 }
             })
         }
@@ -186,7 +119,7 @@ class SearchActivity : AppCompatActivity() {
         }
         // Обработка фокуса
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
-            searchHistoryLayout.visibility = if (hasFocus && inputEditText.text.isEmpty() && searchHistory.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
+            searchHistoryLayout.visibility = if (hasFocus && inputEditText.text.isEmpty() && getSearchHistoryInteractor.getHistory().isNotEmpty()) View.VISIBLE else View.GONE
         }
         inputEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -194,7 +127,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 searchText = s.toString()
                 clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-                searchHistoryLayout.visibility = if (searchHistory.getHistory().isNotEmpty() && inputEditText.hasFocus() && s?.isEmpty() == true) View.VISIBLE else View.GONE
+                searchHistoryLayout.visibility = if (getSearchHistoryInteractor.getHistory().isNotEmpty() && inputEditText.hasFocus() && s?.isEmpty() == true) View.VISIBLE else View.GONE
                 searchDebounce()
             }
             override fun afterTextChanged(s: Editable?) {}
@@ -216,7 +149,7 @@ class SearchActivity : AppCompatActivity() {
         }
         // Обработка нажатия на кнопку "Очистить историю"
         clearHistoryButton.setOnClickListener {
-            searchHistory.clearTrackHistory()
+            getSearchHistoryInteractor.clearTrackHistory()
             historyAdapter.update(emptyList())
             searchHistoryLayout.visibility = View.GONE
         }
