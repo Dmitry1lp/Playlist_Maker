@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
@@ -30,11 +31,9 @@ class PlayerActivity : AppCompatActivity() {
     private var urlTrack: String? = null
     private lateinit var audioTimeIndicator: TextView
     private lateinit var playerPlayButton: ImageButton
+    lateinit var viewModel: PlayerViewModel
 
     private lateinit var binding: ActivityAudioplayerBinding
-    private val viewModel: PlayerViewModel by viewModels {
-        PlayerViewModel.getFactory()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,19 +45,18 @@ class PlayerActivity : AppCompatActivity() {
         val playerBackButton = findViewById<ImageButton>(R.id.iv_back_button)
         val likeButton = findViewById<ImageButton>(R.id.ib_like_button)
 
-
-
         timerHandler = Handler(Looper.getMainLooper())
 
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("KEY_TRACK", Track::class.java)
+            intent.getParcelableExtra(KEY_TRACK, Track::class.java)
         } else {
             @Suppress("DEPRECATION")
-            intent.getParcelableExtra<Track>("KEY_TRACK")
-        }
+            intent.getParcelableExtra<Track>(KEY_TRACK)
+        } ?: return finish()
 
-        track?.let { viewModel.setTrack(it) }
-
+        viewModel = ViewModelProvider(this, PlayerViewModel.getFactory(track))
+            .get(PlayerViewModel::class.java)
+        // Обработка кнопок проигрывания и лайка
         viewModel?.observePlayerState()?.observe(this) { state ->
             binding.ibPlayButton.setImageResource(
                 if (state.isPlaying) R.drawable.paused_button else R.drawable.play_button
@@ -68,7 +66,6 @@ class PlayerActivity : AppCompatActivity() {
             )
             binding.tvTimeIndicator.text = state.currentTime
         }
-
         //Обработка нажатия кнопки Назад
         playerBackButton.setOnClickListener {
             finish()
@@ -97,16 +94,20 @@ class PlayerActivity : AppCompatActivity() {
             binding.tvGenre.text = it.primaryGenreName
             binding.tvCountry.text = it.country
         }
+    }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.onPause()
+    }
 
-        fun onPause() {
-            super.onPause()
-            viewModel.onPause()
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.onDestroy()
+    }
 
-        fun onDestroy() {
-            super.onDestroy()
-            viewModel.onDestroy()
-        }
+    companion object {
+        private const val KEY_TRACK = "KEY_TRACK"
+
     }
 }

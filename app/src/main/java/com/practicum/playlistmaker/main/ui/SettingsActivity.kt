@@ -5,12 +5,20 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.ui.App
+import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.search.data.storage.PrefsStorageClient
+import com.practicum.playlistmaker.settings.ui.SettingsViewModel
+import com.practicum.playlistmaker.settings.ui.App
 
 class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var viewModel: SettingsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -22,32 +30,39 @@ class SettingsActivity : AppCompatActivity() {
         val agreementIcon = findViewById<ImageView>(R.id.agreementButton)
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.settingSwitch)
 
-        val isDarkTheme = (applicationContext as App).darkTheme
-        themeSwitcher.isChecked = isDarkTheme
+        viewModel = ViewModelProvider(this, SettingsViewModel.getFactory(Creator.provideSettingsInteractor(this)))
+            .get(SettingsViewModel::class.java)
 
-        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as App).switchTheme(checked)
-
+        viewModel.isDarkTheme.observe(this) { isDark ->
+            themeSwitcher.isChecked = isDark
         }
 
-        shareIcon.setOnClickListener {
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.type = "text/plain"
-            shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.message))
-            startActivity(shareIntent)
+        viewModel.themeChangedEvent.observe(this) { isDark ->
+            (application as App).switchTheme(isDark)
         }
 
-        helpIcon.setOnClickListener {
-            val helpIntent = Intent(Intent.ACTION_SENDTO)
-            helpIntent.data = Uri.parse("mailto:")
-            helpIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("perovdv1@ya.ru"))
-            helpIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.mailTe))
-            helpIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.mailMessage))
+        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+            viewModel.switchTheme(checked)
+        }
+
+        viewModel?.observeHelpLiveData()?.observe(this) { email ->
+            val helpIntent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:")
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.mailTe))
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.mailMessage))
+            }
             startActivity(helpIntent)
         }
 
-        agreementIcon.setOnClickListener {
-            val url = getString(R.string.offer_url)
+        viewModel?.observeSharedLiveData()?.observe(this) { text ->
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, text)
+            startActivity(shareIntent)
+        }
+
+        viewModel?.observeAgreementLiveData()?.observe(this) { url ->
             val agreeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(agreeIntent)
         }
@@ -55,5 +70,9 @@ class SettingsActivity : AppCompatActivity() {
         backButton.setNavigationOnClickListener {
             finish()
         }
+
+        shareIcon.setOnClickListener { viewModel.onShareClicked() }
+        helpIcon.setOnClickListener { viewModel.onHelpClicked() }
+        agreementIcon.setOnClickListener { viewModel.onAgreementClicked() }
     }
 }

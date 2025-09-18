@@ -1,14 +1,15 @@
 package com.practicum.playlistmaker.search.ui
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.interactor.TracksInteractor
 import com.practicum.playlistmaker.search.domain.models.SearchResult
@@ -31,6 +32,13 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
     fun observePlayerLiveData(): MutableLiveData<Track?> = playerLiveData
 
     init {
+        loadHistory()
+    }
+
+    private var latestSearchText: String? = null
+    private var isClickAllowed = true
+
+    private fun loadHistory() {
         historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
             override fun consume(searchHistory: List<Track>?) {
                 val hasHistory = searchHistory?.isNotEmpty() == true
@@ -47,9 +55,6 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
             }
         })
     }
-
-    private var latestSearchText: String? = null
-    private var isClickAllowed = true
 
     fun performSearch(searchText: String) {
         if (searchText.isEmpty()) {
@@ -172,9 +177,10 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private val SEARCH_REQUEST_TOKEN = Any()
 
-        fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer { val app = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as TracksApplication)
-                SearchViewModel(app.tracksInteractor, app.searchHistoryInteractor) }
+        fun getFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
+            initializer {SearchViewModel(
+                Creator.provideTracksInteractor(),
+                Creator.provideSearchHistoryInteractor(context))}
         }
     }
 }

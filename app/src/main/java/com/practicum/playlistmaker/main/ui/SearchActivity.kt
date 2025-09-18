@@ -38,7 +38,7 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this, SearchViewModel.getFactory())
+        viewModel = ViewModelProvider(this, SearchViewModel.getFactory(this))
             .get(SearchViewModel::class.java)
 
         viewModel?.observeSearchUiStateLiveData?.observe(this) { state ->

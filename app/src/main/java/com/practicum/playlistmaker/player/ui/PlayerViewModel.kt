@@ -11,23 +11,24 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.search.domain.models.Track
 
-class PlayerViewModel : ViewModel() {
+class PlayerViewModel(track: Track) : ViewModel() {
 
     private val playerStateLiveData = MutableLiveData<PlayerUiState>()
     fun observePlayerState(): LiveData<PlayerUiState> = playerStateLiveData
-
-    private val progressTimeLiveData = MutableLiveData("00:00")
-    fun observeProgressTime(): LiveData<String> = progressTimeLiveData
 
     private var mediaPlayer = MediaPlayer()
     private var durationMillis: Long = 0L
     private var currentPosition: Long = 0L
     private var isLiked = false
     private var playerState = STATE_DEFAULT
-    private var currentTrack: Track? = null
-    private var urlTrack: String? = null
+    private var currentTrack: Track? = track
+    private var urlTrack: String? = track.previewUrl
 
     private val handler = Handler(Looper.getMainLooper())
+
+    init {
+        preparePlayer()
+    }
 
     fun onPlayClicked() {
         if (mediaPlayer.isPlaying) {
@@ -120,9 +121,9 @@ class PlayerViewModel : ViewModel() {
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
 
-        fun getFactory(): ViewModelProvider.Factory = viewModelFactory {
+        fun getFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                PlayerViewModel()
+                PlayerViewModel(track)
             }
         }
     }

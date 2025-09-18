@@ -13,6 +13,11 @@ import com.practicum.playlistmaker.search.domain.repository.TracksRepository
 import com.practicum.playlistmaker.search.domain.interactor.TracksInteractorImpl
 import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
 import com.practicum.playlistmaker.search.data.storage.PrefsStorageClient
+import com.practicum.playlistmaker.search.data.storage.StorageClient
+import com.practicum.playlistmaker.settings.data.repository.SettingsRepositoryImpl
+import com.practicum.playlistmaker.settings.domain.impl.SettingsInteractorImpl
+import com.practicum.playlistmaker.settings.domain.models.SettingsInteractor
+import com.practicum.playlistmaker.settings.domain.models.SettingsRepository
 
 object Creator {
     private fun getTracksRepository(): TracksRepository {
@@ -24,6 +29,20 @@ object Creator {
             context,
             "HISTORY",
             object : TypeToken<ArrayList<Track>>() {}.type))
+    }
+
+    private fun getSettingsRepository(context: Context): SettingsRepository {
+        return SettingsRepositoryImpl(
+            PrefsStorageClient(
+                context,
+                "SETTINGS",
+                object : TypeToken<Boolean>() {}.type
+            )
+        )
+    }
+
+    fun provideSettingsInteractor(context: Context): SettingsInteractor {
+        return SettingsInteractorImpl(getSettingsRepository(context))
     }
 
     fun provideTracksInteractor(): TracksInteractor {
