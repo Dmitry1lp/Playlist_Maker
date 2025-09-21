@@ -37,7 +37,7 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     }
 
     fun switchTheme(isDark: Boolean) {
-        settingsInteractor.setDarkTheme(isDark)
+        settingsInteractor.switchTheme(isDark)
         _isDarkTheme.value = isDark
     }
 }
