@@ -3,10 +3,6 @@ package com.practicum.playlistmaker.main.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -15,17 +11,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
-import com.practicum.playlistmaker.search.domain.interactor.TracksInteractor
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.ui.SearchViewModel
 import com.practicum.playlistmaker.search.ui.TrackAdapter
 import com.practicum.playlistmaker.search.ui.TracksState
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
-    private var viewModel: SearchViewModel? = null
+    private val viewModel by viewModel<SearchViewModel>()
     private var searchText: String = ""
 
     private lateinit var binding: ActivitySearchBinding
@@ -38,11 +33,11 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this, SearchViewModel.getFactory(this))
-            .get(SearchViewModel::class.java)
-
         viewModel?.observeSearchUiStateLiveData?.observe(this) { state ->
 
+            binding.recyclerView.visibility = View.GONE
+            binding.placeholderNotInternet.visibility = View.GONE
+            binding.placeholderNotFound.visibility = View.GONE
             // Прогресс
             binding.pbProgressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
