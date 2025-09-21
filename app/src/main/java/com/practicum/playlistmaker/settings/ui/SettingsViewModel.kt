@@ -24,6 +24,11 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     private val agreementLiveData = SingleLiveEvent<String>()
     fun observeAgreementLiveData(): LiveData<String> = agreementLiveData
 
+    init {
+        _isDarkTheme.value = settingsInteractor.getDarkTheme()
+        settingsInteractor.switchTheme(_isDarkTheme.value ?: false)
+    }
+
     fun onShareClicked() {
         sharedLiveData.value = "https://practicum.yandex.ru/profile/android-developer-plus"
     }

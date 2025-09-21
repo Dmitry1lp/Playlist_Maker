@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistmaker.R
@@ -28,6 +29,10 @@ class SettingsActivity : AppCompatActivity() {
 
         viewModel.isDarkTheme.observe(this) { isDark ->
             themeSwitcher.isChecked = isDark
+            AppCompatDelegate.setDefaultNightMode(
+                if (isDark) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            )
         }
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
