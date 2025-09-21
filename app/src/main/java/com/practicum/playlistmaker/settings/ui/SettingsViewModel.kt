@@ -15,9 +15,6 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     private val _isDarkTheme = MutableLiveData(settingsInteractor.getDarkTheme())
     val isDarkTheme: LiveData<Boolean> = _isDarkTheme
 
-    private val themeChangedLiveData = MutableLiveData<Boolean>()
-    val themeChangedEvent: LiveData<Boolean> = themeChangedLiveData
-
     private val sharedLiveData = SingleLiveEvent<String>()
     fun observeSharedLiveData(): LiveData<String> = sharedLiveData
 
@@ -42,15 +39,5 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     fun switchTheme(isDark: Boolean) {
         settingsInteractor.setDarkTheme(isDark)
         _isDarkTheme.value = isDark
-        themeChangedLiveData.value = isDark
-    }
-
-    companion object {
-        fun getFactory(settingsInteractor: SettingsInteractor): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    SettingsViewModel(settingsInteractor)
-                }
-            }
     }
 }

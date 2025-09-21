@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.settings.ui.App
 import com.practicum.playlistmaker.settings.ui.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -27,20 +26,15 @@ class SettingsActivity : AppCompatActivity() {
         val agreementIcon = findViewById<ImageView>(R.id.agreementButton)
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.settingSwitch)
 
-
         viewModel.isDarkTheme.observe(this) { isDark ->
             themeSwitcher.isChecked = isDark
-        }
-
-        viewModel.themeChangedEvent.observe(this) { isDark ->
-            (application as App).switchTheme(isDark)
         }
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             viewModel.switchTheme(checked)
         }
 
-        viewModel?.observeHelpLiveData()?.observe(this) { email ->
+        viewModel.observeHelpLiveData().observe(this) { email ->
             val helpIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
@@ -50,14 +44,14 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(helpIntent)
         }
 
-        viewModel?.observeSharedLiveData()?.observe(this) { text ->
+        viewModel.observeSharedLiveData().observe(this) { text ->
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.type = "text/plain"
             shareIntent.putExtra(Intent.EXTRA_TEXT, text)
             startActivity(shareIntent)
         }
 
-        viewModel?.observeAgreementLiveData()?.observe(this) { url ->
+        viewModel.observeAgreementLiveData().observe(this) { url ->
             val agreeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(agreeIntent)
         }

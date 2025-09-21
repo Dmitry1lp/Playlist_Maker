@@ -1,45 +1,21 @@
 package com.practicum.playlistmaker.settings.ui
 
 import android.app.Application
-import androidx.appcompat.app.AppCompatDelegate
+import com.practicum.playlistmaker.di.dataModule
+import com.practicum.playlistmaker.di.interactorModule
+import com.practicum.playlistmaker.di.repositoryModule
+import com.practicum.playlistmaker.di.viewModelModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.startKoin
 
 class App : Application() {
-
-    var darkTheme = false
 
     override fun onCreate() {
         super.onCreate()
 
-        darkTheme = getSharedPreferences(SETTINGS, MODE_PRIVATE)
-            .getBoolean(KEY_DARK_THEME, false)
-
-        AppCompatDelegate.setDefaultNightMode(
-            if(darkTheme) {
-                AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                AppCompatDelegate.MODE_NIGHT_NO
-            }
-        )
-    }
-
-    fun switchTheme(darkThemeEnabled: Boolean) {
-        darkTheme = darkThemeEnabled
-
-        getSharedPreferences(SETTINGS, MODE_PRIVATE)
-            .edit()
-            .putBoolean(KEY_DARK_THEME, darkThemeEnabled)
-            .apply()
-
-        AppCompatDelegate.setDefaultNightMode(
-            if(darkThemeEnabled){
-                AppCompatDelegate.MODE_NIGHT_YES
-            }else{
-                AppCompatDelegate.MODE_NIGHT_NO
-            }
-        )
-    }
-    companion object {
-        private const val SETTINGS = "settings"
-        private const val KEY_DARK_THEME = "dark_theme"
+        startKoin {
+            androidContext(this@App)
+            modules(dataModule, repositoryModule, interactorModule, viewModelModule)
+        }
     }
 }

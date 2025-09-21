@@ -1,7 +1,10 @@
 package com.practicum.playlistmaker.settings.domain.impl
 
+
+import androidx.appcompat.app.AppCompatDelegate
 import com.practicum.playlistmaker.settings.domain.models.SettingsInteractor
 import com.practicum.playlistmaker.settings.domain.models.SettingsRepository
+
 
 class SettingsInteractorImpl(
     private val repository: SettingsRepository
@@ -11,5 +14,14 @@ class SettingsInteractorImpl(
 
     override fun setDarkTheme(isDark: Boolean) {
         repository.setDarkTheme(isDark)
+    }
+
+    override fun switchTheme(darkThemeEnabled: Boolean) {
+        repository.setDarkTheme(darkThemeEnabled)
+        AppCompatDelegate.setDefaultNightMode(
+            if(darkThemeEnabled){ AppCompatDelegate.MODE_NIGHT_YES
+            }else{ AppCompatDelegate.MODE_NIGHT_NO
+            }
+        )
     }
 }

@@ -21,7 +21,4 @@ val interactorModule = module {
     single<SettingsInteractor> {
         SettingsInteractorImpl(get())
     }
-
-
-
 }
