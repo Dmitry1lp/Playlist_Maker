@@ -25,8 +25,7 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     fun observeAgreementLiveData(): LiveData<String> = agreementLiveData
 
     init {
-        _isDarkTheme.value = settingsInteractor.getDarkTheme()
-        settingsInteractor.switchTheme(_isDarkTheme.value ?: false)
+        settingsInteractor.setDarkTheme(_isDarkTheme.value ?: false)
     }
 
     fun onShareClicked() {
@@ -42,7 +41,7 @@ class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : Vi
     }
 
     fun switchTheme(isDark: Boolean) {
-        settingsInteractor.switchTheme(isDark)
+        settingsInteractor.setDarkTheme(isDark)
         _isDarkTheme.value = isDark
     }
 }

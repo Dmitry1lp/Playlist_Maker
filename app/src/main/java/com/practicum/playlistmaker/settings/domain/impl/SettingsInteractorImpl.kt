@@ -15,12 +15,4 @@ class SettingsInteractorImpl(
     override fun setDarkTheme(isDark: Boolean) {
         repository.setDarkTheme(isDark)
     }
-
-    override fun switchTheme(isDark: Boolean) {
-        repository.setDarkTheme(isDark)
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDark) AppCompatDelegate.MODE_NIGHT_YES
-            else AppCompatDelegate.MODE_NIGHT_NO
-        )
-    }
 }
