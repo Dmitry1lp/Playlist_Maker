@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.interactor.TracksInteractor
 import com.practicum.playlistmaker.search.domain.models.SearchResult
@@ -156,7 +155,7 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
         historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
             override fun consume(searchHistory: List<Track>?) {
                 val hasHistory = searchHistory?.isNotEmpty() == true
-                val showHistory = isInputEmpty && hasHistory // Упрощаем условие
+                val showHistory = isInputEmpty && hasHistory
                 searchUiStateLiveData.postValue(
                     searchUiStateLiveData.value?.copy(isHistoryVisible = showHistory)
                         ?: SearchUiState(isHistoryVisible = showHistory)
@@ -176,12 +175,6 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private val SEARCH_REQUEST_TOKEN = Any()
-
-        fun getFactory(context: Context): ViewModelProvider.Factory = viewModelFactory {
-            initializer {SearchViewModel(
-                Creator.provideTracksInteractor(),
-                Creator.provideSearchHistoryInteractor(context))}
-        }
     }
 }
 

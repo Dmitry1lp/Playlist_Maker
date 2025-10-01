@@ -4,25 +4,32 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.creator.Creator
-import com.practicum.playlistmaker.search.data.storage.PrefsStorageClient
 import com.practicum.playlistmaker.settings.ui.SettingsViewModel
-import com.practicum.playlistmaker.settings.ui.App
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel by viewModel<SettingsViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById<android.view.View>(android.R.id.content)) { view, insets ->
+            val statusBar = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updatePadding(top = statusBar.top)
+            insets
+        }
 
         val backButton = findViewById<MaterialToolbar>(R.id.toolbarSetting)
         val shareIcon = findViewById<ImageView>(R.id.shareButton)
@@ -30,22 +37,19 @@ class SettingsActivity : AppCompatActivity() {
         val agreementIcon = findViewById<ImageView>(R.id.agreementButton)
         val themeSwitcher = findViewById<SwitchMaterial>(R.id.settingSwitch)
 
-        viewModel = ViewModelProvider(this, SettingsViewModel.getFactory(Creator.provideSettingsInteractor(this)))
-            .get(SettingsViewModel::class.java)
-
         viewModel.isDarkTheme.observe(this) { isDark ->
             themeSwitcher.isChecked = isDark
-        }
-
-        viewModel.themeChangedEvent.observe(this) { isDark ->
-            (application as App).switchTheme(isDark)
+            AppCompatDelegate.setDefaultNightMode(
+                if (isDark) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            )
         }
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             viewModel.switchTheme(checked)
         }
 
-        viewModel?.observeHelpLiveData()?.observe(this) { email ->
+        viewModel.observeHelpLiveData().observe(this) { email ->
             val helpIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
@@ -55,14 +59,14 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(helpIntent)
         }
 
-        viewModel?.observeSharedLiveData()?.observe(this) { text ->
+        viewModel.observeSharedLiveData().observe(this) { text ->
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.type = "text/plain"
             shareIntent.putExtra(Intent.EXTRA_TEXT, text)
             startActivity(shareIntent)
         }
 
-        viewModel?.observeAgreementLiveData()?.observe(this) { url ->
+        viewModel.observeAgreementLiveData().observe(this) { url ->
             val agreeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(agreeIntent)
         }
