@@ -24,6 +24,11 @@
     <string name="year" translatable="false">Год</string>
     <string name="album" translatable="false">Альбом</string>
     <string name="duration" translatable="false">Длительность</string>
+    <string name="media_null" translatable="false">Ваша медиатека пуста</string>
+    <string name="new_playlist" translatable="false">Новый плейлист</string>
+    <string name="playlists_null" translatable="false">Вы не создали\n\n ни одного плейлиста</string>
+    <string name="playlists" translatable="false">Плейлисты</string>
+    <string name="favorites" translatable="false">Избранные треки</string>
 
 
 </resources>

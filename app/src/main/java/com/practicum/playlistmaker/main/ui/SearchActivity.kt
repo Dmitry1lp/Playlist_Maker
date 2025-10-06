@@ -13,7 +13,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.search.domain.models.Track
@@ -31,7 +30,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -45,11 +43,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         viewModel?.observeSearchUiStateLiveData?.observe(this) { state ->
-
             binding.recyclerView.visibility = View.GONE
             binding.placeholderNotInternet.visibility = View.GONE
             binding.placeholderNotFound.visibility = View.GONE
-            // Прогресс
             binding.pbProgressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
             // Контент поиска
@@ -77,21 +73,20 @@ class SearchActivity : AppCompatActivity() {
                 }
                 is TracksState.Loading -> {}
             }
+
             // История
             historyAdapter.update(state.history)
-            binding.searchHistory.visibility = if (state.isHistoryVisible) View.VISIBLE else View.GONE
-            // Иконка очистки
+            binding.searchHistory.visibility = if (state.isHistoryVisible && state.history.isNotEmpty()) View.VISIBLE else View.GONE
             binding.clearIcon.visibility = if (state.isClearTextVisible) View.VISIBLE else View.GONE
         }
 
         viewModel?.clearTextEvent?.observe(this) {
             binding.inputEditText.setText("")
-            // Прячем клавиатуру и убираем фокус
             val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
             binding.inputEditText.clearFocus()
         }
-        // Переход на другую активити
+
         viewModel?.observePlayerLiveData()?.observe(this) { track ->
             track?.let {
                 val playerIntent = Intent(this, PlayerActivity::class.java)
@@ -99,25 +94,26 @@ class SearchActivity : AppCompatActivity() {
                 startActivity(playerIntent)
             }
         }
-        //Клик по треку
+
         val onClickTrack: (Track) -> Unit = { track ->
             viewModel?.onTrackClicked(track)
         }
-        // Инициализируем адаптер с пустым списком и назначаем его RecyclerView
+
         searchAdapter = TrackAdapter(emptyList(), onClickTrack)
         historyAdapter = TrackAdapter(emptyList(), onClickTrack)
 
         binding.recyclerView.adapter = searchAdapter
         binding.rvHistory.adapter = historyAdapter
 
-        // Обработка фокуса
-        binding.inputEditText.setOnFocusChangeListener { view, hasFocus ->
-            viewModel?.updateHistoryVisibility(binding.inputEditText.text.isEmpty())
+        binding.inputEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                viewModel?.updateHistoryVisibility(binding.inputEditText.text.isEmpty())
+            }
         }
-        binding.inputEditText.addTextChangedListener{ text ->
+        binding.inputEditText.addTextChangedListener { text ->
             viewModel?.onSearchTextChanged(text.toString())
         }
-        // Обработка нажатия на кнопку "Ввод"
+
         binding.inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 viewModel?.performSearch(binding.inputEditText.text.toString())
@@ -126,32 +122,30 @@ class SearchActivity : AppCompatActivity() {
                 false
             }
         }
-        // Обработка нажатия на кнопку "Обновить"
+
         binding.mbRefresh.setOnClickListener {
             val searchText = binding.inputEditText.text.toString()
             viewModel?.performSearch(searchText)
         }
-        // Обработка нажатия на кнопку "Очистить историю"
+
         binding.mbClear.setOnClickListener {
             viewModel?.clearHistory()
         }
-        // Обработка нажатия на кнопку "Очистки текста"
+
         binding.clearIcon.setOnClickListener {
             viewModel?.onClearTextClicked()
-            // Прячем клавиатуру и убираем фокус
-
         }
-        // Обработка нажатия на кнопку "Назад"
+
         binding.toolbarSearch.setNavigationOnClickListener {
             finish()
         }
     }
-    // Сохраняем состояние поиска при повороте экрана
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(TEXT_SEARCH, searchText)
     }
-    // Восстанавливаем состояние поиска
+
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchText = savedInstanceState.getString(TEXT_SEARCH, "")
