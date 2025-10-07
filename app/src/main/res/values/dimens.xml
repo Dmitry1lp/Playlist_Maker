@@ -29,5 +29,7 @@
     <dimen name="refresh_height">36dp</dimen>
     <dimen name="play_padding">38dp</dimen>
     <dimen name="album">45dp</dimen>
+    <dimen name="media_playlist">46dp</dimen>
     <dimen name="activity_search">48dp</dimen>
+    <dimen name="media_favorites">106dp</dimen>
 </resources>

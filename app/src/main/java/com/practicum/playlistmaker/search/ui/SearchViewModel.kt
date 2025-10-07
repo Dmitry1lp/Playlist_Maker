@@ -1,25 +1,23 @@
 package com.practicum.playlistmaker.search.ui
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.interactor.TracksInteractor
 import com.practicum.playlistmaker.search.domain.models.SearchResult
 import com.practicum.playlistmaker.search.domain.models.Track
 
-class SearchViewModel(private val tracksInteractor: TracksInteractor,
-                      private val historyInteractor: SearchHistoryInteractor
-): ViewModel() {
+class SearchViewModel(
+    private val tracksInteractor: TracksInteractor,
+    private val historyInteractor: SearchHistoryInteractor
+) : ViewModel() {
 
     private var mainThreadHandler = Handler(Looper.getMainLooper())
     private var clickHandler = Handler(Looper.getMainLooper())
+    private var cachedHistory: List<Track> = emptyList()
 
     private val searchUiStateLiveData = MutableLiveData(SearchUiState())
     val observeSearchUiStateLiveData: LiveData<SearchUiState> = searchUiStateLiveData
@@ -30,24 +28,18 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
     private val playerLiveData = MutableLiveData<Track?>()
     fun observePlayerLiveData(): MutableLiveData<Track?> = playerLiveData
 
-    init {
-        loadHistory()
-    }
-
     private var latestSearchText: String? = null
     private var isClickAllowed = true
 
-    private fun loadHistory() {
+    init {
+        // Загружаем историю сразу при создании ViewModel
         historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
             override fun consume(searchHistory: List<Track>?) {
-                val hasHistory = searchHistory?.isNotEmpty() == true
-                val showHistory = latestSearchText.isNullOrEmpty() && hasHistory
+                cachedHistory = searchHistory ?: emptyList()
+                val showHistory = latestSearchText.isNullOrEmpty() && cachedHistory.isNotEmpty()
                 searchUiStateLiveData.postValue(
-                    searchUiStateLiveData.value?.copy(
-                        history = searchHistory ?: emptyList(),
-                        isHistoryVisible = showHistory
-                    ) ?: SearchUiState(
-                        history = searchHistory ?: emptyList(),
+                    SearchUiState(
+                        history = cachedHistory,
                         isHistoryVisible = showHistory
                     )
                 )
@@ -55,11 +47,44 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
         })
     }
 
+    fun updateHistoryVisibility(isInputEmpty: Boolean) {
+        if (cachedHistory.isNotEmpty()) {
+            // Используем кэш, если он есть
+            val showHistory = isInputEmpty && cachedHistory.isNotEmpty()
+            searchUiStateLiveData.postValue(
+                searchUiStateLiveData.value?.copy(
+                    history = cachedHistory,
+                    isHistoryVisible = showHistory
+                ) ?: SearchUiState(
+                    history = cachedHistory,
+                    isHistoryVisible = showHistory
+                )
+            )
+        } else {
+            // Загружаем, если кэш пуст
+            historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
+                override fun consume(searchHistory: List<Track>?) {
+                    cachedHistory = searchHistory ?: emptyList()
+                    val showHistory = isInputEmpty && cachedHistory.isNotEmpty()
+                    searchUiStateLiveData.postValue(
+                        searchUiStateLiveData.value?.copy(
+                            history = cachedHistory,
+                            isHistoryVisible = showHistory
+                        ) ?: SearchUiState(
+                            history = cachedHistory,
+                            isHistoryVisible = showHistory
+                        )
+                    )
+                }
+            })
+        }
+    }
+
     fun performSearch(searchText: String) {
         if (searchText.isEmpty()) {
             searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
                 tracksState = TracksState.Empty,
-                isHistoryVisible = true,
+                isHistoryVisible = cachedHistory.isNotEmpty(),
                 isLoading = false
             )
             return
@@ -81,12 +106,13 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
                     searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
                         tracksState = newState,
                         isLoading = false,
-                        isHistoryVisible = searchText.isEmpty()
+                        isHistoryVisible = searchText.isEmpty() && cachedHistory.isNotEmpty()
                     )
                 }
             }
         })
     }
+
     val searchRunnable = Runnable { latestSearchText?.let { performSearch(it) } }
 
     fun searchDebounce(changedText: String) {
@@ -100,7 +126,7 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
             searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
                 tracksState = TracksState.Empty,
                 isLoading = false,
-                isHistoryVisible = true
+                isHistoryVisible = cachedHistory.isNotEmpty()
             )
         }
         updateHistoryVisibility(changedText.isEmpty())
@@ -114,23 +140,24 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
     fun updateClearTextIconVisibility(hasText: Boolean) {
         searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(isClearTextVisible = hasText)
     }
-    //    Клик по треку
+
     fun onTrackClicked(track: Track) {
         historyInteractor.saveToHistory(track)
         historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
             override fun consume(searchHistory: List<Track>?) {
+                cachedHistory = searchHistory ?: emptyList()
                 searchUiStateLiveData.postValue(
-                    searchUiStateLiveData.value?.copy(history = searchHistory ?: emptyList())
-                        ?: SearchUiState(history = searchHistory ?: emptyList())
+                    searchUiStateLiveData.value?.copy(history = cachedHistory)
+                        ?: SearchUiState(history = cachedHistory)
                 )
-
+                if (clickDebounce()) { playerLiveData.value = track }
             }
         })
-        if (clickDebounce()) { playerLiveData.value = track }
     }
-    //Очистка истории
+
     fun clearHistory() {
         historyInteractor.clearTrackHistory()
+        cachedHistory = emptyList()
         searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
             history = emptyList(),
             isHistoryVisible = false
@@ -141,8 +168,8 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
         super.onCleared()
         mainThreadHandler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
     }
-    //Дебаунс кликов по треку
-    fun clickDebounce() : Boolean {
+
+    fun clickDebounce(): Boolean {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
@@ -151,19 +178,6 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
         return current
     }
 
-    fun updateHistoryVisibility(isInputEmpty: Boolean) {
-        historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
-            override fun consume(searchHistory: List<Track>?) {
-                val hasHistory = searchHistory?.isNotEmpty() == true
-                val showHistory = isInputEmpty && hasHistory
-                searchUiStateLiveData.postValue(
-                    searchUiStateLiveData.value?.copy(isHistoryVisible = showHistory)
-                        ?: SearchUiState(isHistoryVisible = showHistory)
-                )
-            }
-        })
-    }
-    // Изменение текста
     fun onSearchTextChanged(text: String) {
         updateClearTextIconVisibility(text.isNotEmpty())
         searchDebounce(text)
@@ -171,7 +185,6 @@ class SearchViewModel(private val tracksInteractor: TracksInteractor,
     }
 
     companion object {
-
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private val SEARCH_REQUEST_TOKEN = Any()
