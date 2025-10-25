@@ -2,12 +2,13 @@
     <!-- Base application theme. -->
     <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary -->
-        <item name="colorPrimary">@color/backgroundMain</item>
+        <item name="colorPrimary">@color/black_light</item>
         <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/black_light</item>
         <item name="colorOnBackground">@color/white</item>
         <item name="colorOnSurface">@color/white</item>
         <item name="colorOnPrimaryContainer">@color/white</item>
+        <item name="colorOnTertiaryContainer">@color/black_light</item>
 
 
         <!-- Secondary -->
@@ -19,7 +20,7 @@
         <item name="android:textColorPrimary">@color/light_search_bar</item>
 
         <!-- Система -->
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
+<!--        <item name="android:statusBarColor">?attr/colorPrimary</item>-->
     </style>
 </resources>
 
