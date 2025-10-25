@@ -1,6 +1,6 @@
 [versions]
 activityKtx = "1.11.0"
-agp = "8.11.2"
+agp = "8.13.0"
 glide = "4.14.2"
 googleMaterial = "1.6.1"
 googleMaterialVersion = "1.11.0"

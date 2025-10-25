@@ -1,48 +1,41 @@
-package com.practicum.playlistmaker.main.ui
+package com.practicum.playlistmaker.search.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.databinding.FragmentSearchBinding
+import com.practicum.playlistmaker.player.ui.PlayerFragment
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.search.ui.SearchViewModel
-import com.practicum.playlistmaker.search.ui.TrackAdapter
-import com.practicum.playlistmaker.search.ui.TracksState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment: Fragment() {
 
     private val viewModel by viewModel<SearchViewModel>()
-    private var searchText: String = ""
-
-    private lateinit var binding: ActivitySearchBinding
+    private lateinit var binding: FragmentSearchBinding
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById<android.view.View>(android.R.id.content)) { view, insets ->
-            val statusBar = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-            view.updatePadding(top = statusBar.top)
-            insets
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        viewModel?.observeSearchUiStateLiveData?.observe(this) { state ->
+        viewModel.observeSearchUiStateLiveData.observe(viewLifecycleOwner) { state ->
             binding.recyclerView.visibility = View.GONE
             binding.placeholderNotInternet.visibility = View.GONE
             binding.placeholderNotFound.visibility = View.GONE
@@ -56,21 +49,25 @@ class SearchActivity : AppCompatActivity() {
                     binding.placeholderNotInternet.visibility = View.GONE
                     binding.placeholderNotFound.visibility = View.GONE
                 }
+
                 is TracksState.ErrorInternet -> {
                     binding.recyclerView.visibility = View.GONE
                     binding.placeholderNotInternet.visibility = View.VISIBLE
                     binding.placeholderNotFound.visibility = View.GONE
                 }
+
                 is TracksState.ErrorFound -> {
                     binding.recyclerView.visibility = View.GONE
                     binding.placeholderNotInternet.visibility = View.GONE
                     binding.placeholderNotFound.visibility = View.VISIBLE
                 }
+
                 is TracksState.Empty -> {
                     binding.recyclerView.visibility = View.GONE
                     binding.placeholderNotInternet.visibility = View.GONE
                     binding.placeholderNotFound.visibility = View.GONE
                 }
+
                 is TracksState.Loading -> {}
             }
 
@@ -80,23 +77,23 @@ class SearchActivity : AppCompatActivity() {
             binding.clearIcon.visibility = if (state.isClearTextVisible) View.VISIBLE else View.GONE
         }
 
-        viewModel?.clearTextEvent?.observe(this) {
+        viewModel.clearTextEvent.observe(viewLifecycleOwner) {
             binding.inputEditText.setText("")
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
             binding.inputEditText.clearFocus()
         }
 
-        viewModel?.observePlayerLiveData()?.observe(this) { track ->
+        viewModel.observePlayerLiveData().observe(viewLifecycleOwner) { track ->
             track?.let {
-                val playerIntent = Intent(this, PlayerActivity::class.java)
-                playerIntent.putExtra(KEY, it)
-                startActivity(playerIntent)
+                findNavController().navigate(R.id.action_searchFragment2_to_playerFragment,
+                    PlayerFragment.createArgs(it))
+                viewModel.observePlayerLiveData().value = null
             }
         }
 
         val onClickTrack: (Track) -> Unit = { track ->
-            viewModel?.onTrackClicked(track)
+            viewModel.onTrackClicked(track)
         }
 
         searchAdapter = TrackAdapter(emptyList(), onClickTrack)
@@ -107,16 +104,16 @@ class SearchActivity : AppCompatActivity() {
 
         binding.inputEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                viewModel?.updateHistoryVisibility(binding.inputEditText.text.isEmpty())
+                viewModel.updateHistoryVisibility(binding.inputEditText.text.isEmpty())
             }
         }
         binding.inputEditText.addTextChangedListener { text ->
-            viewModel?.onSearchTextChanged(text.toString())
+            viewModel.onSearchTextChanged(text.toString())
         }
 
         binding.inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                viewModel?.performSearch(binding.inputEditText.text.toString())
+                viewModel.performSearch(binding.inputEditText.text.toString())
                 true
             } else {
                 false
@@ -125,31 +122,32 @@ class SearchActivity : AppCompatActivity() {
 
         binding.mbRefresh.setOnClickListener {
             val searchText = binding.inputEditText.text.toString()
-            viewModel?.performSearch(searchText)
+            viewModel.performSearch(searchText)
         }
 
         binding.mbClear.setOnClickListener {
-            viewModel?.clearHistory()
+            viewModel.clearHistory()
         }
 
         binding.clearIcon.setOnClickListener {
-            viewModel?.onClearTextClicked()
+            viewModel.onClearTextClicked()
         }
 
         binding.toolbarSearch.setNavigationOnClickListener {
-            finish()
+            findNavController().navigateUp()
+        }
+
+        savedInstanceState?.getString(TEXT_SEARCH)?.let { text ->
+            binding.inputEditText.setText(text)
+            binding.inputEditText.setSelection(text.length)
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(TEXT_SEARCH, searchText)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        searchText = savedInstanceState.getString(TEXT_SEARCH, "")
-        findViewById<EditText>(R.id.inputEditText).setText(searchText)
+        if (::binding.isInitialized) {
+            outState.putString(TEXT_SEARCH, binding.inputEditText.text.toString())
+        }
     }
 
     companion object {

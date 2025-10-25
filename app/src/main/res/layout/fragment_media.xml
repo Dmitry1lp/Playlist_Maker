@@ -3,8 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:background="?attr/colorOnPrimary">
+    android:background="?attr/colorOnPrimary"
+    tools:context="com.practicum.playlistmaker.media.ui.MediaFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarMedia"
@@ -16,8 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:title="@string/media"
-        app:navigationIconTint="?attr/colorPrimaryVariant"
-        app:navigationIcon="@drawable/light_modesetting"
         app:titleTextAppearance="@style/TextAppearance.ToolbarTitle.Normal" />
 
     <com.google.android.material.tabs.TabLayout

@@ -13,6 +13,9 @@
         <item name="colorSecondary">@color/white</item>
         <item name="colorSecondaryVariant">@color/light_search_bar</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="colorTertiary">@color/backgroundMain</item>
+        <item name="colorOnTertiary">@color/black_light</item>
+
         <item name="android:textColorPrimary">@color/light_search_bar</item>
 
 
