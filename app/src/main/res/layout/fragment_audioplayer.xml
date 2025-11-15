@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorOnPrimary"
-    android:paddingBottom="@dimen/radiusSize">
+    android:paddingBottom="@dimen/radiusSize"
+    tools:context="com.practicum.playlistmaker.player.ui.PlayerFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_leftBorder"

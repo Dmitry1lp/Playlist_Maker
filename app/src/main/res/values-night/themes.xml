@@ -8,15 +8,19 @@
         <item name="colorOnBackground">@color/white</item>
         <item name="colorOnSurface">@color/white</item>
         <item name="colorOnPrimaryContainer">@color/white</item>
+        <item name="colorOnTertiaryContainer">@color/black_light</item>
+
 
         <!-- Secondary -->
         <item name="colorSecondary">@color/white</item>
         <item name="colorSecondaryVariant">@color/black</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="colorTertiary">@color/backgroundMain</item>
+        <item name="colorOnTertiary">@color/white</item>
         <item name="android:textColorPrimary">@color/light_search_bar</item>
 
         <!-- Система -->
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
+<!--        <item name="android:statusBarColor">?attr/colorPrimary</item>-->
     </style>
 </resources>
 

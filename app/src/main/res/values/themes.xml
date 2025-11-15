@@ -2,22 +2,26 @@
     <!-- Base application theme. -->
     <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary -->
-        <item name="colorPrimary">@color/backgroundMain</item>
+        <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/black_light</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorOnBackground">@color/track_off</item>
         <item name="colorOnSurface">@color/light_search_bar</item>
         <item name="colorOnPrimaryContainer">@color/black_light</item>
+        <item name="colorOnTertiaryContainer">@color/white</item>
 
         <!-- Secondary -->
         <item name="colorSecondary">@color/white</item>
         <item name="colorSecondaryVariant">@color/light_search_bar</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="colorTertiary">@color/backgroundMain</item>
+        <item name="colorOnTertiary">@color/black_light</item>
+
         <item name="android:textColorPrimary">@color/light_search_bar</item>
 
 
         <!-- Система -->
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
+<!--        <item name="android:statusBarColor">?attr/colorPrimary</item>-->
     </style>
 </resources>
 <!--    <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />-->
