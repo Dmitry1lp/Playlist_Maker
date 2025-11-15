@@ -5,16 +5,18 @@ import com.practicum.playlistmaker.search.data.network.dto.TracksSearchResponse
 import com.practicum.playlistmaker.search.data.network.client.NetworkClient
 import com.practicum.playlistmaker.search.domain.repository.TracksRepository
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
 class TracksRepositoryImpl (private val networkClient: NetworkClient) : TracksRepository {
 
-    override fun searchTrack(expression: String): List<Track> {
+    override fun searchTrack(expression: String): Flow<List<Track>> = flow {
         val response = networkClient.doRequest(TracksSearchRequest(expression))
-        if (response.resultCode == 200) {
-            return (response as TracksSearchResponse).results.map {
+        val tracks = if (response.resultCode == 200) {
+             (response as TracksSearchResponse).results.map {
                 val releaseDateTrack = try {
                     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
                     dateFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -38,8 +40,9 @@ class TracksRepositoryImpl (private val networkClient: NetworkClient) : TracksRe
                     artworkUrl100 = it.artworkUrl100
                 ) }
         } else {
-            return emptyList()
+            emptyList()
         }
+        emit(tracks)
     }
 
     private fun formatTrackTime(trackTimeMillis: Long): String {

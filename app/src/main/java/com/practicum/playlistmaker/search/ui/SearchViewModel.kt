@@ -5,10 +5,14 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInteractor
 import com.practicum.playlistmaker.search.domain.interactor.TracksInteractor
 import com.practicum.playlistmaker.search.domain.models.SearchResult
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val tracksInteractor: TracksInteractor,
@@ -30,6 +34,9 @@ class SearchViewModel(
 
     private var latestSearchText: String? = null
     private var isClickAllowed = true
+    private var searchJob: Job? = null
+
+    val clickDebounceDelay get() = CLICK_DEBOUNCE_DELAY
 
     init {
         // Загружаем историю сразу при создании ViewModel
@@ -95,9 +102,10 @@ class SearchViewModel(
             isHistoryVisible = false
         )
 
-        tracksInteractor.searchTrack(searchText, object : TracksInteractor.TracksConsumer {
-            override fun consume(result: SearchResult) {
-                mainThreadHandler.post {
+        viewModelScope.launch {
+            tracksInteractor
+                .searchTrack(searchText)
+                .collect{ result ->
                     val newState = when (result) {
                         is SearchResult.Success -> TracksState.Content(result.tracks)
                         is SearchResult.NotFound -> TracksState.ErrorFound
@@ -110,26 +118,28 @@ class SearchViewModel(
                     )
                 }
             }
-        })
-    }
+        }
 
-    val searchRunnable = Runnable { latestSearchText?.let { performSearch(it) } }
+
 
     fun searchDebounce(changedText: String) {
         if (latestSearchText == changedText) return
         this.latestSearchText = changedText
 
-        mainThreadHandler.removeCallbacks(searchRunnable)
-        if (changedText.isNotEmpty()) {
-            mainThreadHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-        } else {
-            searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
-                tracksState = TracksState.Empty,
-                isLoading = false,
-                isHistoryVisible = cachedHistory.isNotEmpty()
-            )
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            if (changedText.isNotEmpty()) {
+                delay(SEARCH_DEBOUNCE_DELAY)
+                performSearch(changedText)
+            } else {
+                searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
+                    tracksState = TracksState.Empty,
+                    isLoading = false,
+                    isHistoryVisible = cachedHistory.isNotEmpty()
+                )
+            }
+            updateHistoryVisibility(changedText.isEmpty())
         }
-        updateHistoryVisibility(changedText.isEmpty())
     }
 
     fun onClearTextClicked() {
@@ -173,7 +183,11 @@ class SearchViewModel(
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            clickHandler?.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+
+            viewModelScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
         }
         return current
     }
