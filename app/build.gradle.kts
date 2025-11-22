@@ -55,12 +55,15 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.9.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.9.5")
     implementation("androidx.fragment:fragment-ktx:1.8.9")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     
 
     implementation(libs.glide)
     implementation (libs.retrofit2.retrofit)
     implementation (libs.converter.gson)
     implementation (libs.retrofit2.retrofit)
+    implementation(libs.androidx.room.ktx)
     annotationProcessor(libs.compiler)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

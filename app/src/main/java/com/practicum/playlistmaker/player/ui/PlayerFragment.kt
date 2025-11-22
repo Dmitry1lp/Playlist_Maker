@@ -40,23 +40,29 @@ class PlayerFragment: Fragment() {
         viewModel = ViewModelProvider(this, PlayerViewModel.getFactory(track))
             .get(PlayerViewModel::class.java)
 
-        // Обработка кнопок проигрывания и лайка
         viewModel.observePlayerState().observe(viewLifecycleOwner) { state ->
-            binding.ibPlayButton.setImageResource(
-                if (state.isPlaying) R.drawable.paused_button else R.drawable.play_button
-            )
-            binding.ibLikeButton.setImageResource(
-                if (state.isLiked) R.drawable.like_red_button else R.drawable.like_button
-            )
-            binding.tvTimeIndicator.text = state.currentTime
+            binding.tvTimeIndicator.text = state.progress
+
+            // Меняем кнопку в зависимости от состояния
+            when (state) {
+                is PlayerState.Playing -> {
+                    binding.ibPlayButton.setImageResource(R.drawable.paused_button)
+                }
+                is PlayerState.Paused,
+                is PlayerState.Prepared,
+                is PlayerState.Default -> {
+                    binding.ibPlayButton.setImageResource(R.drawable.play_button)
+                }
+            }
+            binding.ibPlayButton.isEnabled = state.isPlayButtonEnabled
         }
 
         binding.ivBackButton.setOnClickListener {
             findNavController().navigateUp()
         }
-        //Обработка нажатия кнопки Play
+        // Обработка нажатия кнопки Play
         binding.ibPlayButton.setOnClickListener {
-            viewModel.onPlayClicked()
+            viewModel.onPlayButtonClicked()
         }
         //Обработка нажатия кнопки Like
         binding.ibLikeButton.setOnClickListener {

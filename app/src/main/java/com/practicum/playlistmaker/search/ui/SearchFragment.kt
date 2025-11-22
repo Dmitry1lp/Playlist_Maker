@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.search.ui
 
+import android.R.attr.track
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,11 +10,13 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.player.ui.PlayerFragment
 import com.practicum.playlistmaker.search.domain.models.Track
+import com.practicum.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment: Fragment() {
@@ -22,6 +25,7 @@ class SearchFragment: Fragment() {
     private lateinit var binding: FragmentSearchBinding
     private lateinit var searchAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,6 +39,30 @@ class SearchFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Дебаунс для кликов
+        onTrackClickDebounce = debounce<Track>(viewModel.clickDebounceDelay, viewLifecycleOwner.lifecycleScope) { track ->
+            viewModel.onTrackClicked(track)
+        }
+
+        val onClickTrack: (Track) -> Unit = { track ->
+            onTrackClickDebounce(track)
+        }
+
+        searchAdapter = TrackAdapter(emptyList(), onClickTrack)
+        historyAdapter = TrackAdapter(emptyList(), onClickTrack)
+
+        binding.recyclerView.adapter = searchAdapter
+        binding.rvHistory.adapter = historyAdapter
+
+        viewModel.observePlayerLiveData().observe(viewLifecycleOwner) { track ->
+            track?.let {
+                findNavController().navigate(R.id.action_searchFragment2_to_playerFragment,
+                    PlayerFragment.createArgs(it))
+                viewModel.observePlayerLiveData().value = null
+            }
+        }
+
+        // state
         viewModel.observeSearchUiStateLiveData.observe(viewLifecycleOwner) { state ->
             binding.recyclerView.visibility = View.GONE
             binding.placeholderNotInternet.visibility = View.GONE
@@ -83,24 +111,6 @@ class SearchFragment: Fragment() {
             imm?.hideSoftInputFromWindow(binding.inputEditText.windowToken, 0)
             binding.inputEditText.clearFocus()
         }
-
-        viewModel.observePlayerLiveData().observe(viewLifecycleOwner) { track ->
-            track?.let {
-                findNavController().navigate(R.id.action_searchFragment2_to_playerFragment,
-                    PlayerFragment.createArgs(it))
-                viewModel.observePlayerLiveData().value = null
-            }
-        }
-
-        val onClickTrack: (Track) -> Unit = { track ->
-            viewModel.onTrackClicked(track)
-        }
-
-        searchAdapter = TrackAdapter(emptyList(), onClickTrack)
-        historyAdapter = TrackAdapter(emptyList(), onClickTrack)
-
-        binding.recyclerView.adapter = searchAdapter
-        binding.rvHistory.adapter = historyAdapter
 
         binding.inputEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
