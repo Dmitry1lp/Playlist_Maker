@@ -12,11 +12,25 @@ import com.bumptech.glide.Glide
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioplayerBinding
 import com.practicum.playlistmaker.search.domain.models.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class PlayerFragment: Fragment() {
 
-    private lateinit var viewModel: PlayerViewModel
     private lateinit var binding: FragmentAudioplayerBinding
+
+    private val track: Track by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireArguments().getParcelable(KEY_TRACK, Track::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            requireArguments().getParcelable<Track>(KEY_TRACK)
+        } ?: throw IllegalArgumentException("Track is null")
+    }
+
+    private val viewModel: PlayerViewModel by viewModel {
+        parametersOf(track)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,15 +44,11 @@ class PlayerFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requireArguments().getParcelable(KEY_TRACK, Track::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            requireArguments().getParcelable<Track>(KEY_TRACK)
-        } ?: return
-
-        viewModel = ViewModelProvider(this, PlayerViewModel.getFactory(track))
-            .get(PlayerViewModel::class.java)
+        viewModel.observePlayerUiState().observe(viewLifecycleOwner) { state ->
+            binding.ibLikeButton.setImageResource(
+                if(state.isLiked) R.drawable.like_red_button else R.drawable.like_button
+            )
+        }
 
         viewModel.observePlayerState().observe(viewLifecycleOwner) { state ->
             binding.tvTimeIndicator.text = state.progress
@@ -66,7 +76,7 @@ class PlayerFragment: Fragment() {
         }
         //Обработка нажатия кнопки Like
         binding.ibLikeButton.setOnClickListener {
-            viewModel.onLikeClicked()
+            viewModel.onFavoriteClicked()
         }
 
         track.let {

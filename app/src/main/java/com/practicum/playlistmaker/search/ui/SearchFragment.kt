@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.search.ui
 
-import android.R.attr.track
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater

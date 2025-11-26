@@ -20,7 +20,6 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private var mainThreadHandler = Handler(Looper.getMainLooper())
-    private var clickHandler = Handler(Looper.getMainLooper())
     private var cachedHistory: List<Track> = emptyList()
 
     private val searchUiStateLiveData = MutableLiveData(SearchUiState())
@@ -40,18 +39,16 @@ class SearchViewModel(
 
     init {
         // Загружаем историю сразу при создании ViewModel
-        historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
-            override fun consume(searchHistory: List<Track>?) {
-                cachedHistory = searchHistory ?: emptyList()
-                val showHistory = latestSearchText.isNullOrEmpty() && cachedHistory.isNotEmpty()
-                searchUiStateLiveData.postValue(
-                    SearchUiState(
-                        history = cachedHistory,
-                        isHistoryVisible = showHistory
-                    )
+        viewModelScope.launch {
+            cachedHistory = historyInteractor.getHistory()
+            val showHistory = latestSearchText.isNullOrEmpty() && cachedHistory.isNotEmpty()
+            searchUiStateLiveData.postValue(
+                SearchUiState(
+                    history = cachedHistory,
+                    isHistoryVisible = showHistory
                 )
-            }
-        })
+            )
+        }
     }
 
     fun updateHistoryVisibility(isInputEmpty: Boolean) {
@@ -69,24 +66,21 @@ class SearchViewModel(
             )
         } else {
             // Загружаем, если кэш пуст
-            historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
-                override fun consume(searchHistory: List<Track>?) {
-                    cachedHistory = searchHistory ?: emptyList()
-                    val showHistory = isInputEmpty && cachedHistory.isNotEmpty()
-                    searchUiStateLiveData.postValue(
-                        searchUiStateLiveData.value?.copy(
-                            history = cachedHistory,
-                            isHistoryVisible = showHistory
-                        ) ?: SearchUiState(
-                            history = cachedHistory,
-                            isHistoryVisible = showHistory
-                        )
+            viewModelScope.launch {
+                cachedHistory = historyInteractor.getHistory()
+                val showHistory = isInputEmpty && cachedHistory.isNotEmpty()
+                searchUiStateLiveData.postValue(
+                    searchUiStateLiveData.value?.copy(
+                        history = cachedHistory,
+                        isHistoryVisible = showHistory
+                    ) ?: SearchUiState(
+                        history = cachedHistory,
+                        isHistoryVisible = showHistory
                     )
-                }
-            })
+                )
+            }
         }
     }
-
     fun performSearch(searchText: String) {
         if (searchText.isEmpty()) {
             searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
@@ -152,17 +146,17 @@ class SearchViewModel(
     }
 
     fun onTrackClicked(track: Track) {
-        historyInteractor.saveToHistory(track)
-        historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
-            override fun consume(searchHistory: List<Track>?) {
-                cachedHistory = searchHistory ?: emptyList()
-                searchUiStateLiveData.postValue(
-                    searchUiStateLiveData.value?.copy(history = cachedHistory)
-                        ?: SearchUiState(history = cachedHistory)
-                )
-                if (clickDebounce()) { playerLiveData.value = track }
+        viewModelScope.launch {
+            historyInteractor.saveToHistory(track)
+            cachedHistory = historyInteractor.getHistory()
+            searchUiStateLiveData.postValue(
+                searchUiStateLiveData.value?.copy(history = cachedHistory)
+                    ?: SearchUiState(history = cachedHistory)
+            )
+            if (clickDebounce()) {
+                playerLiveData.value = track
             }
-        })
+        }
     }
 
     fun clearHistory() {

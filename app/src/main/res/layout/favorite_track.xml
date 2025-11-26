@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/trackLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/album"
+        android:layout_height="@dimen/album"
+        android:layout_width="@dimen/album"
+        android:src="@drawable/ic_placeholder"
+        android:background="?attr/colorOnPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="RtlSymmetry" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/textLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/album"
+        app:layout_constraintTop_toTopOf="@id/album"
+        app:layout_constraintEnd_toStartOf="@id/vector"
+        app:layout_constraintBottom_toBottomOf="@id/album"
+        android:paddingStart="@dimen/medium_padding"
+        tools:ignore="RtlSymmetry">
+
+        <TextView
+            android:id="@+id/trackName"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:font="@font/ys_display_regular"
+            android:textSize="@dimen/setting_text"
+            android:textColor="?attr/colorPrimaryVariant"
+            tools:text="@string/trackName"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/trackGroup"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintTop_toBottomOf="@id/trackName"
+            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="@dimen/group_text"
+            tools:text="@string/artist"
+            tools:ignore="RtlSymmetry" />
+
+        <ImageView
+            android:id="@+id/ellipse"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/trackGroup"
+            app:layout_constraintTop_toBottomOf="@id/trackName"
+            app:layout_constraintBottom_toBottomOf="@id/trackGroup"
+            android:paddingStart="@dimen/min_padding"
+            app:tint="?attr/colorOnSurface"
+            android:src="@drawable/ellipse_1"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/trackTime"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="?attr/colorOnSurface"
+            android:paddingStart="@dimen/min_padding"
+            android:textSize="@dimen/group_text"
+            app:layout_constraintStart_toEndOf="@id/ellipse"
+            app:layout_constraintBottom_toBottomOf="@id/trackGroup"
+            tools:text="@string/time"
+            tools:ignore="RtlSymmetry" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/vector"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:src="@drawable/agreement"
+        android:paddingEnd="@dimen/edit_search"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="RtlSymmetry" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

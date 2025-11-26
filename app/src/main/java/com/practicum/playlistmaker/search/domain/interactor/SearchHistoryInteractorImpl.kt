@@ -11,9 +11,8 @@ class SearchHistoryInteractorImpl(
         repository.clearHistory()
     }
 
-    override fun getHistory(consumer: SearchHistoryInteractor.HistoryConsumer) {
-        val data = repository.getHistory().data
-        consumer.consume(data)
+    override suspend fun getHistory(): List<Track> {
+        return repository.getHistory()
     }
 
     override fun saveToHistory(t: Track) {

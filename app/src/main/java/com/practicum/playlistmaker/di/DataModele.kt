@@ -1,8 +1,10 @@
 package com.practicum.playlistmaker.di
 
 import android.content.Context
+import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.practicum.playlistmaker.media.data.db.AppDatabase
 import com.practicum.playlistmaker.search.data.network.api.iTunesAPI
 import com.practicum.playlistmaker.search.data.network.client.NetworkClient
 import com.practicum.playlistmaker.search.data.network.client.RetrofitNetworkClient
@@ -59,5 +61,10 @@ val dataModule = module {
             dataKey = "search_history",
             type = object : TypeToken<List<Track>>() {}.type
         )
+    }
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .build()
     }
 }

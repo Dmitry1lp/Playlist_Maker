@@ -5,6 +5,6 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 interface SearchHistoryRepository {
     fun saveToHistory(t: Track)
-    fun getHistory(): Resource<List<Track>>
+    suspend fun getHistory(): List<Track>
     fun clearHistory()
 }

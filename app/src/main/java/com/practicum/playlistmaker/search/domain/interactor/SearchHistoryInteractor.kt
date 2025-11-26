@@ -4,11 +4,7 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 interface SearchHistoryInteractor {
     fun clearTrackHistory()
-
-    fun getHistory(consumer: HistoryConsumer)
+    suspend fun getHistory(): List<Track>
     fun saveToHistory(t: Track)
 
-    interface HistoryConsumer {
-        fun consume(searchHistory: List<Track>?)
-    }
 }

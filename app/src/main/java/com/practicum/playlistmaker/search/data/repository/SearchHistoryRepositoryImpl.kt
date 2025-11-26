@@ -1,16 +1,27 @@
 package com.practicum.playlistmaker.search.data.repository
 
+import com.practicum.playlistmaker.media.data.db.AppDatabase
 import com.practicum.playlistmaker.search.data.model.Resource
 import com.practicum.playlistmaker.search.data.storage.StorageClient
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.search.domain.repository.SearchHistoryRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class SearchHistoryRepositoryImpl(private val storage: StorageClient<ArrayList<Track>>):
+class SearchHistoryRepositoryImpl(
+    private val storage: StorageClient<ArrayList<Track>>,
+    private val appDatabase: AppDatabase):
     SearchHistoryRepository {
 
-    override fun getHistory(): Resource<List<Track>> {
-        val track = storage.getData() ?: listOf()
-        return Resource.Success(track)
+    override suspend fun getHistory(): List<Track> = withContext(Dispatchers.IO) {
+        val tracks = storage.getData() ?: listOf()
+
+        val favoriteId = appDatabase.trackDao().getTracksId()
+        tracks.forEach { track ->
+            track.isFavorite = favoriteId.contains(track.trackId)
+        }
+
+        return@withContext tracks
     }
 
     override fun clearHistory() {
