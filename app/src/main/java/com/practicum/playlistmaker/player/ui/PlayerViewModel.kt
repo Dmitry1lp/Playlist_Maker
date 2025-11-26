@@ -8,26 +8,38 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.practicum.playlistmaker.media.domain.db.FavoriteTrackInteractor
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerViewModel(track: Track) : ViewModel() {
-
-//    private val playerStateLiveData = MutableLiveData<PlayerUiState>()
-//    fun observePlayerState(): LiveData<PlayerUiState> = playerStateLiveData
+class PlayerViewModel(
+    track: Track,
+    private val favoriteTrackInteractor: FavoriteTrackInteractor
+) : ViewModel() {
 
     private val playerState = MutableLiveData<PlayerState>(PlayerState.Default())
     fun observePlayerState(): LiveData<PlayerState> = playerState
 
+    private val playerStateLiveData = MutableLiveData<PlayerUiState>()
+    fun observePlayerUiState(): LiveData<PlayerUiState> = playerStateLiveData
+
+
     private var mediaPlayer = MediaPlayer()
-    private var currentTrack: Track? = track
+    private val currentTrack: Track? = track
     private var timerJob: Job? = null
 
     init {
+        viewModelScope.launch {
+            val favorites = favoriteTrackInteractor.getFavoriteTrack().first()
+            val isFav = favorites.any { it.trackId == track.trackId }
+            val updatedTrack = track.copy(isFavorite = isFav)
+            playerStateLiveData.postValue(PlayerUiState(track = updatedTrack, isLiked = isFav))
+        }
         preparePlayer()
     }
 
@@ -43,22 +55,26 @@ class PlayerViewModel(track: Track) : ViewModel() {
         }
     }
 
-//    fun onPlayClicked() {
-//        if (mediaPlayer.isPlaying) {
-//            mediaPlayer.pause()
-//            stopTimer()
-//            playerStateLiveData.value = playerStateLiveData.value?.copy(isPlaying = false)
-//        } else {
-//            mediaPlayer.start()
-//            startTimer()
-//            playerStateLiveData.value = playerStateLiveData.value?.copy(isPlaying = true)
-//        }
-//    }
-//
-//    fun onLikeClicked() {
-//        val liked = !(playerStateLiveData.value?.isLiked ?: false)
-//        playerStateLiveData.value = playerStateLiveData.value?.copy(isLiked = liked)
-//    }
+    fun onFavoriteClicked() {
+        val track = currentTrack ?: return
+        viewModelScope.launch {
+
+            val newFavorite = !track.isFavorite
+            track.isFavorite = newFavorite
+
+            val newState = playerStateLiveData.value?.copy(track = track, isLiked = track.isFavorite)
+                ?: PlayerUiState(track = track,
+                    isLiked = track.isFavorite)
+
+            playerStateLiveData.postValue(newState)
+
+            if (track.isFavorite) {
+                favoriteTrackInteractor.addTrackToFavorite(track)
+            } else {
+                favoriteTrackInteractor.deleteTrackIntoFavorite(track)
+            }
+        }
+    }
 
     private fun preparePlayer() {
         val track = currentTrack ?: return
@@ -79,25 +95,6 @@ class PlayerViewModel(track: Track) : ViewModel() {
                 e.printStackTrace()
             }
         }
-    }
-
-//    private val timerRunnable = object : Runnable {
-//        override fun run() {
-//            if (mediaPlayer.isPlaying) {
-//                val elapsedTime = mediaPlayer.currentPosition
-//                val minutes = (elapsedTime / 1000) / 60
-//                val seconds = (elapsedTime / 1000) % 60
-//                val time = String.format("%02d:%02d", minutes, seconds)
-//                playerStateLiveData.value = playerStateLiveData.value?.copy(currentTime = time)
-//                handler.postDelayed(this, REFRESH_DELAY_MILLIS)
-//            }
-//        }
-//    }
-//    private fun stopTimer() = handler.removeCallbacks(timerRunnable)
-
-    fun setTrack(track: Track) {
-        currentTrack = track
-        preparePlayer()
     }
 
     private fun startTimer() {
@@ -127,19 +124,6 @@ class PlayerViewModel(track: Track) : ViewModel() {
         playerState.value = PlayerState.Default()
     }
 
-    fun onLikeClicked() {
-        val current = playerState.value
-        if (current != null) {
-            val newState = when (current) {
-                is PlayerState.Playing -> PlayerState.Playing(current.progress)
-                is PlayerState.Paused -> PlayerState.Paused(current.progress)
-                is PlayerState.Prepared -> PlayerState.Prepared()
-                else -> current
-            }
-            playerState.postValue(newState)
-        }
-    }
-
     private fun getCurrentPlayerPosition(): String {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition) ?: "00:00"
     }
@@ -147,12 +131,6 @@ class PlayerViewModel(track: Track) : ViewModel() {
     fun onPause() {
         pausePlayer()
     }
-    //        if (mediaPlayer.isPlaying) {
-//            mediaPlayer.pause()
-//            playerStateLiveData.value = playerStateLiveData.value?.copy(isPlaying = false)
-//            handler.removeCallbacksAndMessages(null)
-//        }
-
 
     fun onDestroy() {
         mediaPlayer.release()
@@ -161,15 +139,13 @@ class PlayerViewModel(track: Track) : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         releasePlayer()
-//        mediaPlayer.release()
-//        handler.removeCallbacks(timerRunnable)
     }
 
     companion object {
 
-        fun getFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
+        fun getFactory(track: Track, favoriteTrackInteractor: FavoriteTrackInteractor): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                PlayerViewModel(track)
+                PlayerViewModel(track, favoriteTrackInteractor)
             }
         }
     }
