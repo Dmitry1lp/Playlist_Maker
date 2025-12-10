@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.search.data.repository
 
+import com.practicum.playlistmaker.media.data.converters.TrackDbConvertor
+import com.practicum.playlistmaker.media.data.db.AppDatabase
 import com.practicum.playlistmaker.search.data.network.dto.TracksSearchRequest
 import com.practicum.playlistmaker.search.data.network.dto.TracksSearchResponse
 import com.practicum.playlistmaker.search.data.network.client.NetworkClient
@@ -11,7 +13,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class TracksRepositoryImpl (private val networkClient: NetworkClient) : TracksRepository {
+class TracksRepositoryImpl(
+    private val networkClient: NetworkClient,
+    private val appDatabase: AppDatabase,
+    private val trackDbConvertor: TrackDbConvertor) : TracksRepository {
 
     override fun searchTrack(expression: String): Flow<List<Track>> = flow {
         val response = networkClient.doRequest(TracksSearchRequest(expression))
@@ -39,13 +44,23 @@ class TracksRepositoryImpl (private val networkClient: NetworkClient) : TracksRe
                     trackTime = formatTrackTime(it.trackTimeMillis),
                     artworkUrl100 = it.artworkUrl100
                 ) }
+
         } else {
             emptyList()
+        }
+        val favoriteId = appDatabase.trackDao().getTracksId()
+        tracks.forEach { track ->
+            track.isFavorite = favoriteId.contains(track.trackId)
         }
         emit(tracks)
     }
 
     private fun formatTrackTime(trackTimeMillis: Long): String {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(trackTimeMillis)
+    }
+
+    private suspend fun saveTrack(tracks: List<Track>) {
+        val trackEntities = tracks.map { track -> trackDbConvertor.map(track) }
+        appDatabase.trackDao().insertTracks(trackEntities)
     }
 }

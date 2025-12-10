@@ -57,6 +57,11 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.9")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+
+    implementation("androidx.room:room-runtime:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4")
+
+    kapt("androidx.room:room-compiler:2.8.4")
     
 
     implementation(libs.glide)
