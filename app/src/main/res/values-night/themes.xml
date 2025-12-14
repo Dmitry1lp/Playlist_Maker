@@ -18,6 +18,8 @@
         <item name="colorTertiary">@color/backgroundMain</item>
         <item name="colorOnTertiary">@color/white</item>
         <item name="android:textColorPrimary">@color/light_search_bar</item>
+        <item name="colorOnTertiaryFixed">@color/white</item>
+
 
         <!-- Система -->
 <!--        <item name="android:statusBarColor">?attr/colorPrimary</item>-->

@@ -16,11 +16,6 @@ class SearchHistoryRepositoryImpl(
     override suspend fun getHistory(): List<Track> = withContext(Dispatchers.IO) {
         val tracks = storage.getData() ?: listOf()
 
-        val favoriteId = appDatabase.trackDao().getTracksId()
-        tracks.forEach { track ->
-            track.isFavorite = favoriteId.contains(track.trackId)
-        }
-
         return@withContext tracks
     }
 

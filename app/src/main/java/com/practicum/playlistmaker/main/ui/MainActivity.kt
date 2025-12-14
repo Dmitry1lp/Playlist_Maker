@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             bottomNavigationView.visibility = when (destination.id) {
+                R.id.favoritesInfoFragment -> View.GONE
                 R.id.playerFragment -> View.GONE
                 else -> View.VISIBLE
             }

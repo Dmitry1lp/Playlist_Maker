@@ -1,11 +1,10 @@
-package com.practicum.playlistmaker.media.ui
+package com.practicum.playlistmaker.media.ui.favorites
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.search.domain.models.Track
-import com.practicum.playlistmaker.media.ui.FavoritesTrackViewHolder
 
 class FavoriteTrackAdapter(
     private var tracks: List<Track>,

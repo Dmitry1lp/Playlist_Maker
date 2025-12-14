@@ -1,0 +1,19 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Нажатая -->
+    <item android:state_enabled="true">
+        <shape>
+            <solid android:color="?attr/colorTertiary" />
+            <corners android:radius="8dp"/>
+        </shape>
+    </item>
+
+    <!-- Неактивная -->
+    <item android:state_enabled="false">
+        <shape>
+            <solid android:color="?attr/android:textColorPrimary" />
+            <corners android:radius="8dp"/>
+        </shape>
+    </item>
+
+</selector>

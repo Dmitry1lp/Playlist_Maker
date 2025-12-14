@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.media.ui
+package com.practicum.playlistmaker.media.ui.favorites
 
 import android.content.Context
 import android.util.TypedValue

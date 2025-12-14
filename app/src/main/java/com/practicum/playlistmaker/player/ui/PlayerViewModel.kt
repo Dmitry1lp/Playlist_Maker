@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.media.domain.db.FavoriteTrackInteractor
+import com.practicum.playlistmaker.media.domain.db.PlaylistInteractor
+import com.practicum.playlistmaker.media.domain.playlist.model.Playlist
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -19,7 +21,8 @@ import java.util.Locale
 
 class PlayerViewModel(
     track: Track,
-    private val favoriteTrackInteractor: FavoriteTrackInteractor
+    private val favoriteTrackInteractor: FavoriteTrackInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     private val playerState = MutableLiveData<PlayerState>(PlayerState.Default())
@@ -28,9 +31,15 @@ class PlayerViewModel(
     private val playerStateLiveData = MutableLiveData<PlayerUiState>()
     fun observePlayerUiState(): LiveData<PlayerUiState> = playerStateLiveData
 
+    private val _playerBottomSheetUiState = MutableLiveData<PlayerBottomSheetUiState>()
+    val observePlayerBottomSheetUiState: LiveData<PlayerBottomSheetUiState> = _playerBottomSheetUiState
+
+    private val _addTrack = MutableLiveData<AddTrack>()
+    val observeAddTrack: LiveData<AddTrack> = _addTrack
+
 
     private var mediaPlayer = MediaPlayer()
-    private val currentTrack: Track? = track
+    private var currentTrack: Track = track
     private var timerJob: Job? = null
 
     init {
@@ -41,6 +50,7 @@ class PlayerViewModel(
             playerStateLiveData.postValue(PlayerUiState(track = updatedTrack, isLiked = isFav))
         }
         preparePlayer()
+        getPlaylists()
     }
 
     fun onPlayButtonClicked() {
@@ -55,23 +65,35 @@ class PlayerViewModel(
         }
     }
 
+    private fun getPlaylists() {
+        viewModelScope.launch {
+            playlistInteractor.getAllPlaylists().collect { playlist ->
+                val playlistCopy = playlist.map { it.copy() }
+                if (playlistCopy.isNullOrEmpty()) {
+                    _playerBottomSheetUiState.postValue(PlayerBottomSheetUiState.Empty)
+                } else {
+                    _playerBottomSheetUiState.postValue(PlayerBottomSheetUiState.Content(playlist))
+                }
+            }
+        }
+    }
+
     fun onFavoriteClicked() {
-        val track = currentTrack ?: return
         viewModelScope.launch {
 
-            val newFavorite = !track.isFavorite
-            track.isFavorite = newFavorite
+            val newFavorite = !currentTrack.isFavorite
+            currentTrack = currentTrack.copy(isFavorite = newFavorite)
 
-            val newState = playerStateLiveData.value?.copy(track = track, isLiked = track.isFavorite)
-                ?: PlayerUiState(track = track,
-                    isLiked = track.isFavorite)
-
+            val newState = PlayerUiState(
+                track = currentTrack,
+                isLiked = newFavorite
+            )
             playerStateLiveData.postValue(newState)
 
-            if (track.isFavorite) {
-                favoriteTrackInteractor.addTrackToFavorite(track)
+            if (newFavorite) {
+                favoriteTrackInteractor.addTrackToFavorite(currentTrack)
             } else {
-                favoriteTrackInteractor.deleteTrackIntoFavorite(track)
+                favoriteTrackInteractor.deleteTrackIntoFavorite(currentTrack)
             }
         }
     }
@@ -96,6 +118,19 @@ class PlayerViewModel(
             }
         }
     }
+
+    fun onAddTrackToPlaylistClicked(playlist: Playlist) {
+        if (playlist.trackId.contains(currentTrack.trackId)) {
+            _addTrack.postValue(AddTrack.NotAdded)
+            return
+        } else {
+            viewModelScope.launch {
+                playlistInteractor.addTrackToPlaylist(playlist,currentTrack)
+                _addTrack.postValue(AddTrack.Added)
+            }
+        }
+    }
+
 
     private fun startTimer() {
         timerJob = viewModelScope.launch {
@@ -143,9 +178,9 @@ class PlayerViewModel(
 
     companion object {
 
-        fun getFactory(track: Track, favoriteTrackInteractor: FavoriteTrackInteractor): ViewModelProvider.Factory = viewModelFactory {
+        fun getFactory(track: Track, favoriteTrackInteractor: FavoriteTrackInteractor, playlistInteractor: PlaylistInteractor): ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                PlayerViewModel(track, favoriteTrackInteractor)
+                PlayerViewModel(track, favoriteTrackInteractor, playlistInteractor)
             }
         }
     }

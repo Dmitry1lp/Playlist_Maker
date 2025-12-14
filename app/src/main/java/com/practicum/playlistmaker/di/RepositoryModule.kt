@@ -1,8 +1,11 @@
 package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.media.data.FavoriteTrackRepositoryImpl
+import com.practicum.playlistmaker.media.data.PlaylistRepositoryImpl
 import com.practicum.playlistmaker.media.data.converters.TrackDbConvertor
+import com.practicum.playlistmaker.media.data.db.AppDatabase
 import com.practicum.playlistmaker.media.domain.FavoriteTracksRepository
+import com.practicum.playlistmaker.media.domain.PlaylistRepository
 import com.practicum.playlistmaker.search.data.repository.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.search.data.repository.TracksRepositoryImpl
 import com.practicum.playlistmaker.search.data.storage.StorageClient
@@ -15,20 +18,24 @@ import org.koin.dsl.module
 
 val repositoryModule = module {
 
-    single<TracksRepository> {
+    factory<TracksRepository> {
         TracksRepositoryImpl(get(), get(), get())
     }
 
-    single<SearchHistoryRepository> {
+    factory<SearchHistoryRepository> {
         SearchHistoryRepositoryImpl(get(qualifier = named("search_history")), get())
     }
 
-    single<SettingsRepository> {
+    factory<SettingsRepository> {
         SettingsRepositoryImpl(get<StorageClient<Boolean>>(qualifier = named("dark_theme")))
     }
 
-    single<FavoriteTracksRepository> {
-        FavoriteTrackRepositoryImpl(get(), get())
+    factory<FavoriteTracksRepository> {
+        FavoriteTrackRepositoryImpl(get<AppDatabase>().trackDao(), get())
+    }
+
+    factory<PlaylistRepository> {
+        PlaylistRepositoryImpl(get<AppDatabase>().playlistDao(),get<AppDatabase>().trackFavoriteDao(),get())
     }
 
     factory { TrackDbConvertor() }

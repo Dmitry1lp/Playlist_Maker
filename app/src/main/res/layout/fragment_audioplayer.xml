@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorOnPrimary"
+    tools:context="com.practicum.playlistmaker.player.ui.PlayerFragment">
+
+<androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorOnPrimary"
-    android:paddingBottom="@dimen/radiusSize"
+    android:paddingBottom="@dimen/radiusSize_16dp"
     tools:context="com.practicum.playlistmaker.player.ui.PlayerFragment">
 
     <androidx.constraintlayout.widget.Guideline
@@ -14,15 +21,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/radiusSize" />
+        app:layout_constraintGuide_begin="@dimen/radiusSize_16dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_rightBorder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/radiusSize" />
+        app:layout_constraintGuide_end="@dimen/radiusSize_16dp" />
     <!-- Назад-->
+
     <ImageButton
         android:id="@+id/iv_back_button"
         android:layout_width="@dimen/zerodp"
@@ -38,7 +46,7 @@
         android:id="@+id/ll_country"
         android:layout_width="match_parent"
         android:layout_height="@dimen/tv_search_history"
-        android:layout_marginBottom="@dimen/audio_bot"
+        android:layout_marginBottom="@dimen/search_not_internet_24dp"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +56,7 @@
             style="@style/AudioTextView1"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
             android:layout_weight="1"
             android:text="@string/country" />
 
@@ -57,8 +65,8 @@
             style="@style/AudioTextView2"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
-            android:layout_marginEnd="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
+            android:layout_marginEnd="@dimen/radiusSize_16dp"
             android:layout_weight="2"
             android:text="@string/country" />
     </LinearLayout>
@@ -76,7 +84,7 @@
             style="@style/AudioTextView1"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
             android:layout_weight="1"
             android:text="@string/genre" />
 
@@ -85,8 +93,8 @@
             style="@style/AudioTextView2"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
-            android:layout_marginEnd="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
+            android:layout_marginEnd="@dimen/radiusSize_16dp"
             android:layout_weight="2"
             android:text="@string/genre" />
     </LinearLayout>
@@ -104,7 +112,7 @@
             style="@style/AudioTextView1"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
             android:layout_weight="1"
             android:text="@string/year" />
 
@@ -113,8 +121,8 @@
             style="@style/AudioTextView2"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
-            android:layout_marginEnd="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
+            android:layout_marginEnd="@dimen/radiusSize_16dp"
             android:layout_weight="2"
             android:text="@string/year" />
     </LinearLayout>
@@ -132,7 +140,7 @@
             style="@style/AudioTextView1"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
             android:layout_weight="1"
             android:text="@string/album" />
 
@@ -141,8 +149,8 @@
             style="@style/AudioTextView2"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
-            android:layout_marginEnd="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
+            android:layout_marginEnd="@dimen/radiusSize_16dp"
             android:layout_weight="2"
             android:text="@string/album" />
     </LinearLayout>
@@ -160,7 +168,7 @@
             style="@style/AudioTextView1"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
             android:layout_weight="1"
             android:text="@string/duration" />
 
@@ -169,8 +177,8 @@
             style="@style/AudioTextView2"
             android:layout_width="@dimen/zerodp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/radiusSize"
-            android:layout_marginEnd="@dimen/radiusSize"
+            android:layout_marginStart="@dimen/radiusSize_16dp"
+            android:layout_marginEnd="@dimen/radiusSize_16dp"
             android:layout_weight="2"
             android:text="@string/duration" />
     </LinearLayout>
@@ -229,7 +237,7 @@
         android:layout_width="@dimen/zerodp"
         android:layout_height="@dimen/zerodp"
         android:layout_marginTop="@dimen/album_padding"
-        android:layout_marginBottom="@dimen/search_not_internet"
+        android:layout_marginBottom="@dimen/search_not_internet_24dp"
         android:background="?attr/colorOnPrimary"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_placeholder"
@@ -259,5 +267,53 @@
         app:layout_constraintBottom_toTopOf="@id/tv_groupName"
         app:layout_constraintStart_toStartOf="@id/tv_groupName" />
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:visibility="gone"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/standart_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bottom_sheet_rounded"
+        android:padding="16dp"
+        app:behavior_peekHeight="@dimen/bottom_sheet_505dp"
+        app:behavior_hideable="true"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <TextView
+            android:id="@+id/tv_add_to_playlist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_in_playlist"
+            style="@style/FavoriteAdd"
+            android:paddingBottom="@dimen/radiusSize_16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mb_new_playlist"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/refresh_height"
+            android:text="@string/new_playlist"
+            android:background="@drawable/refresh_button"
+            app:layout_constraintTop_toBottomOf="@id/tv_add_to_playlist"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            style="@style/RefreshIcon" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_audio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/search_not_internet_24dp"
+            app:layout_constraintTop_toBottomOf="@+id/mb_new_playlist"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
