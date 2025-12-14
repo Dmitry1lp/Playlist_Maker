@@ -2,7 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary -->
-        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimary">@color/black_light</item>
+        <item name="colorAccent">@color/white</item>
         <item name="colorPrimaryVariant">@color/black_light</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorOnBackground">@color/track_off</item>
