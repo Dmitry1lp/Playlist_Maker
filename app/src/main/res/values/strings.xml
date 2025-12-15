@@ -35,4 +35,12 @@
     <string name="zero_track" translatable="false">0 треков</string>
     <string name="favorite_view_name" translatable="false">Наименование</string>
     <string name="add_in_playlist" translatable="false">Добавить в плейлист</string>
+
+    <plurals name="tracks_count" translatable="false">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d трека</item>
+    </plurals>
+
 </resources>

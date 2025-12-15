@@ -11,7 +11,7 @@
     <!-- Неактивная -->
     <item android:state_enabled="false">
         <shape>
-            <solid android:color="?attr/android:textColorPrimary" />
+            <solid android:color="?attr/colorTertiaryContainer" />
             <corners android:radius="8dp"/>
         </shape>
     </item>

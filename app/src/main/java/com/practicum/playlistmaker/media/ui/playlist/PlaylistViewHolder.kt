@@ -21,14 +21,17 @@ class PlaylistViewHolder(private val binding: PlaylistViewBinding): RecyclerView
 
     fun bind(item: Playlist) {
         binding.tvPlaylistName.text = item.name
-        binding.tvTrackCount.text = item.trackCount.toString()
+        binding.tvTrackCount.text = itemView.resources.getQuantityString(
+            R.plurals.tracks_count,
+            item.trackCount,
+            item.trackCount
+        )
 
         Glide.with(itemView.context)
             .load(item.filePath?.let { File(it) })
             .placeholder(R.drawable.ic_placeholder)
             .error(R.drawable.ic_placeholder)
             .centerCrop()
-            .transform(RoundedCorners(cornerRadius))
             .into(binding.ivPlaylistImage)
 
     }

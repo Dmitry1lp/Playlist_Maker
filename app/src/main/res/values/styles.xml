@@ -157,8 +157,9 @@
 
     </style>
 
-    <style name="RoundedCorner12">
+    <style name="roundedImageViewStyle" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">12dp</item>
+        <item name="cornerSize">8dp</item>
     </style>
+
 </resources>

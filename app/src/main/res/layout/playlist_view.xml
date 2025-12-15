@@ -8,12 +8,13 @@
     android:paddingVertical="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_playlist_image"
-        android:layout_height="@dimen/favorites_view"
         android:layout_width="@dimen/favorites_view"
+        android:layout_height="@dimen/favorites_view"
         android:src="@drawable/ic_placeholder"
-        android:background="?attr/colorOnPrimary"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/roundedImageViewStyle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />

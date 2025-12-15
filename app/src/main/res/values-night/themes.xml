@@ -7,6 +7,7 @@
         <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/black_light</item>
         <item name="colorOnBackground">@color/white</item>
+        <item name="colorPrimaryFixed">@color/white</item>
         <item name="colorOnSurface">@color/white</item>
         <item name="colorOnPrimaryContainer">@color/white</item>
         <item name="colorOnTertiaryContainer">@color/black_light</item>
@@ -18,8 +19,10 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="colorTertiary">@color/backgroundMain</item>
         <item name="colorOnTertiary">@color/white</item>
-        <item name="android:textColorPrimary">@color/light_search_bar</item>
+        <item name="colorTertiaryContainer">@color/light_search_bar</item>
         <item name="colorOnTertiaryFixed">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
 
 
         <!-- Система -->
