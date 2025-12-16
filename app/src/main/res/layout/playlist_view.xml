@@ -4,16 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="12dp"
-    android:paddingVertical="8dp"
+    android:paddingStart="@dimen/back_button_"
+    android:paddingEnd="@dimen/back_button_"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_playlist_image"
-        android:layout_width="@dimen/favorites_view"
-        android:layout_height="@dimen/favorites_view"
+        android:layout_width="@dimen/zerodp"
+        android:layout_height="@dimen/zerodp"
         android:src="@drawable/ic_placeholder"
         android:scaleType="centerCrop"
+        app:layout_constraintWidth_percent="1.0"
+        app:layout_constraintDimensionRatio="1:1"
         app:shapeAppearanceOverlay="@style/roundedImageViewStyle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -22,7 +24,7 @@
         <TextView
             android:id="@+id/tv_playlist_name"
             android:layout_height="wrap_content"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zerodp"
             android:font="@font/ys_display_regular"
             android:textSize="@dimen/favorites_12sp"
             android:textColor="?attr/colorPrimaryVariant"

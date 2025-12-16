@@ -35,6 +35,12 @@
     <string name="zero_track" translatable="false">0 треков</string>
     <string name="favorite_view_name" translatable="false">Наименование</string>
     <string name="add_in_playlist" translatable="false">Добавить в плейлист</string>
+    <string name="playlist_created" translatable="false">Плейлист успешно создан</string>
+    <string name="playlist_complete" translatable="false">Завершить создание плейлиста?</string>
+    <string name="playlist_cancel" translatable="false">Отмена</string>
+    <string name="playlist_lost" translatable="false">Все несохраненные данные будут потеряны</string>
+    <string name="playlist_complete_btn" translatable="false">Все несохраненные данные будут потеряны</string>
+    <string name="error" translatable="false">Ошибка</string>
 
     <plurals name="tracks_count" translatable="false">
         <item quantity="one">%d трек</item>

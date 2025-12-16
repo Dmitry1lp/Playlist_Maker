@@ -22,9 +22,12 @@
         android:id="@+id/rv_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/edit_search_12dp"
+        android:layout_marginEnd="@dimen/edit_search_12dp"
+        android:layout_marginBottom="@dimen/search_not_internet_24dp"
         app:layout_constraintTop_toBottomOf="@id/mb_new_playlist"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/iv_placeholderMedia"
@@ -46,11 +49,9 @@
         android:text="@string/playlists_null"
         android:paddingTop="@dimen/radiusSize_16dp"
         android:lineSpacingMultiplier="0.85"
-        android:lineSpacingExtra="-10dp"
+        android:lineSpacingExtra="@dimen/media_10dp"
         android:textColor="?attr/colorPrimaryVariant"
         app:layout_constraintTop_toBottomOf="@id/iv_placeholderMedia"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

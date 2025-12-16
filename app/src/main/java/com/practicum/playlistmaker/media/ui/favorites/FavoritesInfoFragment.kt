@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentInfoFavoritesBinding
 import com.practicum.playlistmaker.media.domain.playlist.model.Playlist
 import java.io.File
@@ -96,25 +97,23 @@ class FavoritesInfoFragment: Fragment() {
         viewModel.createPlaylist(playlist)
 
         findNavController().navigateUp()
-        Toast.makeText(requireContext(),"Плейлист успешно создан", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), R.string.playlist_created, Toast.LENGTH_SHORT).show()
     }
 
     private fun copyImage(uri: Uri, fileName: String): String? {
         return try {
-            val file = File(requireContext().filesDir, fileName)
-            if (!file.exists()) file.mkdir()
+            val file = File(requireContext().filesDir, "playlist_images")
+            if (!file.exists()) file.mkdirs()
 
             val newFile = File(file, "$fileName${System.currentTimeMillis()}.jpg")
 
-            val inputStream = requireContext().contentResolver.openInputStream(uri) ?: return null
-
-            val outputStream = newFile.outputStream()
-            inputStream.use { input ->
-                outputStream.use { output ->
+            requireContext().contentResolver.openInputStream(uri)?.use { input ->
+                newFile.outputStream().use { output ->
                     input.copyTo(output)
                 }
             }
-            return newFile.absolutePath
+
+            newFile.absolutePath
         } catch (e: Exception) {
             null
         }
@@ -130,12 +129,12 @@ class FavoritesInfoFragment: Fragment() {
 
     private fun toShowDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Завершить создание плейлиста?") // Заголовок диалога
-            .setMessage("Все несохраненные данные будут потеряны") // Описание диалога
-            .setNeutralButton("Отмена") { dialog, which -> // Добавляет кнопку «Отмена»
+            .setTitle(R.string.playlist_complete) // Заголовок диалога
+            .setMessage(R.string.playlist_lost) // Описание диалога
+            .setNeutralButton(R.string.playlist_cancel) { dialog, which -> // Добавляет кнопку «Отмена»
                 // Действия, выполняемые при нажатии на кнопку «Отмена»
             }
-            .setPositiveButton("Завершить") { dialog, which -> // Добавляет кнопку «Да»
+            .setPositiveButton(R.string.playlist_complete_btn) { dialog, which -> // Добавляет кнопку «Да»
                 hideKeyboard()
                 findNavController().navigateUp() // Действия, выполняемые при нажатии на кнопку «Да»
             }

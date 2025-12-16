@@ -36,17 +36,20 @@
 
     <ImageButton
         android:id="@+id/ib_image"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/zerodp"
+        android:layout_height="@dimen/zerodp"
         android:src="@drawable/favorites_image_album"
-        android:clipToOutline="true"
         android:background="@drawable/favorites_info_image_bg"
         android:layout_marginTop="@dimen/album_padding"
         android:layout_marginStart="@dimen/search_not_internet_24dp"
         android:layout_marginEnd="@dimen/search_not_internet_24dp"
+
+        app:layout_constraintHeight_percent="0.43"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintTop_toBottomOf="@id/toolbarFavorites"
+
+
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/et_name"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <EditText
@@ -65,8 +68,7 @@
         style="@style/FavoritesTextName"
         app:layout_constraintTop_toBottomOf="@id/ib_image"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/et_description"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
         android:id="@+id/et_description"
@@ -82,8 +84,7 @@
         style="@style/FavoritesTextName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_name"
-        app:layout_constraintBottom_toTopOf="@id/btn_create"/>
+        app:layout_constraintTop_toBottomOf="@id/et_name" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_create"
@@ -93,14 +94,13 @@
         android:layout_marginStart="@dimen/favorite_17dp"
         android:layout_marginEnd="@dimen/favorite_17dp"
         android:layout_marginBottom="@dimen/tv_search_history"
-        android:layout_marginTop="@dimen/favorites_info"
+
         android:gravity="center"
         app:backgroundTint="@null"
         android:background="@drawable/favorites_info_btn_bg"
         style="@style/FavoritesTextCreate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_description" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

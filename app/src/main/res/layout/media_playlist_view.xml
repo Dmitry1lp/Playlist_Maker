@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="12dp"
-    android:paddingVertical="8dp"
+    android:paddingHorizontal="@dimen/edit_search_12dp"
+    android:paddingVertical="@dimen/medium_padding"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
@@ -20,7 +20,7 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/textLayout"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/zerodp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/iv_playlist_image"
         app:layout_constraintTop_toTopOf="@id/iv_playlist_image"
