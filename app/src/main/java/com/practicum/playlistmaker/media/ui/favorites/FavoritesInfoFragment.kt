@@ -2,10 +2,12 @@ package com.practicum.playlistmaker.media.ui.favorites
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
@@ -14,6 +16,8 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentInfoFavoritesBinding
@@ -35,10 +39,17 @@ class FavoritesInfoFragment: Fragment() {
         selectedImageUri = uri
 
         if (uri != null) {
+            val radius = resources.getDimensionPixelSize(R.dimen.radiusSize_16dp)
             Glide.with(requireContext())
-                .load(selectedImageUri)
+                .load(uri)
                 .centerCrop()
+                .apply(RequestOptions().transform(RoundedCorners(radius)))
                 .into(binding.ibImage)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                binding.ibImage.outlineProvider = ViewOutlineProvider.BACKGROUND
+                binding.ibImage.clipToOutline = true
+            }
         }
     }
 
@@ -70,6 +81,7 @@ class FavoritesInfoFragment: Fragment() {
 
         binding.ibImage.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
         }
 
         binding.btnCreate.setOnClickListener {
