@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:background="?attr/colorOnPrimary"
-    tools:context="com.practicum.playlistmaker.media.ui.MediaFragment">
+    tools:context="com.practicum.playlistmaker.media.ui.media.MediaFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarMedia"

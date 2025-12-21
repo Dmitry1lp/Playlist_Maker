@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.media.ui
+package com.practicum.playlistmaker.media.ui.favorites
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,6 @@ import com.practicum.playlistmaker.databinding.FragmentMediaFavoritesBinding
 import com.practicum.playlistmaker.player.ui.PlayerFragment
 import com.practicum.playlistmaker.search.domain.models.Track
 import com.practicum.playlistmaker.utils.debounce
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FavoritesFragment : Fragment() {
@@ -74,10 +73,10 @@ class FavoritesFragment : Fragment() {
         }
     }
 
-
-
-
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     companion object {
 

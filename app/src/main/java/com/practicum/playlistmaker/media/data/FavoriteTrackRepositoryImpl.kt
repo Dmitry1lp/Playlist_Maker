@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.media.data
 
 import com.practicum.playlistmaker.media.data.converters.TrackDbConvertor
 import com.practicum.playlistmaker.media.data.db.AppDatabase
+import com.practicum.playlistmaker.media.data.db.TrackDao
 import com.practicum.playlistmaker.media.data.db.TrackEntity
 import com.practicum.playlistmaker.media.domain.FavoriteTracksRepository
 import com.practicum.playlistmaker.search.domain.models.Track
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class FavoriteTrackRepositoryImpl(
-    private val appDatabase: AppDatabase,
+    private val trackDao: TrackDao,
     private val trackDbConvertor: TrackDbConvertor
 ): FavoriteTracksRepository {
 
@@ -19,17 +20,17 @@ class FavoriteTrackRepositoryImpl(
         val trackEntity = convertFromTrack(track).copy(
             addedAt = System.currentTimeMillis()
         )
-        appDatabase.trackDao().insertTrack(trackEntity)
+        trackDao.insertTrack(trackEntity)
     }
 
     override suspend fun deleteTrackIntoFavorite(track: Track) {
         track.isFavorite = false
         val trackEntity = convertFromTrack(track)
-        appDatabase.trackDao().deleteTrackEntity(trackEntity)
+        trackDao.deleteTrackEntity(trackEntity)
     }
 
     override fun getFavoriteTrack(): Flow<List<Track>> =
-        appDatabase.trackDao().getTracks().map { tracks ->
+        trackDao.getTracks().map { tracks ->
                 convertFromTrackEntity(tracks)
     }
 
@@ -42,7 +43,7 @@ class FavoriteTrackRepositoryImpl(
     }
 
     override suspend fun clearFavorites() {
-        appDatabase.trackDao().clearAll()
+        trackDao.clearAll()
     }
 
 }

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?attr/colorOnPrimary"
-    android:paddingBottom="@dimen/radiusSize"
+    android:paddingBottom="@dimen/radiusSize_16dp"
     tools:context="com.practicum.playlistmaker.settings.ui.SettingsFragment">
 
     <!-- Настройки-->
@@ -26,7 +26,7 @@
         style="@style/SettingText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/radiusSize"
+        android:paddingHorizontal="@dimen/radiusSize_16dp"
         android:paddingVertical="@dimen/night_padding"
         android:text="@string/dark_theme"
         app:thumbTint="@color/selector_switch_thumb"

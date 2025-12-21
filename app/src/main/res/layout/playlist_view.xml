@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/trackLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/back_button_"
+    android:paddingEnd="@dimen/back_button_"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_playlist_image"
+        android:layout_width="@dimen/zerodp"
+        android:layout_height="@dimen/zerodp"
+        android:src="@drawable/ic_placeholder"
+        android:scaleType="centerCrop"
+        app:layout_constraintWidth_percent="1.0"
+        app:layout_constraintDimensionRatio="1:1"
+        app:shapeAppearanceOverlay="@style/roundedImageViewStyle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_playlist_name"
+            android:layout_height="wrap_content"
+            android:layout_width="@dimen/zerodp"
+            android:font="@font/ys_display_regular"
+            android:textSize="@dimen/favorites_12sp"
+            android:textColor="?attr/colorPrimaryVariant"
+            tools:text="@string/favorite_view_name"
+            app:layout_constraintTop_toBottomOf="@id/iv_playlist_image"
+            app:layout_constraintStart_toStartOf="@id/iv_playlist_image"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_track_count"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="?attr/colorPrimaryVariant"
+            app:layout_constraintTop_toBottomOf="@id/tv_playlist_name"
+            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="@dimen/favorites_12sp"
+            tools:text="@string/zero_track" />
+</androidx.constraintlayout.widget.ConstraintLayout>
