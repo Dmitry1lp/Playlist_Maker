@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.favoritesInfoFragment -> View.GONE
                 R.id.playerFragment -> View.GONE
                 R.id.playlistFragment -> View.GONE
+                R.id.editPlaylistFragment -> View.GONE
                 else -> View.VISIBLE
             }
         }
