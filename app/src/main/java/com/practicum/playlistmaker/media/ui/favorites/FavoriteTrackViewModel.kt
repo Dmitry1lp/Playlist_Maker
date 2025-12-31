@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.media.domain.db.FavoriteTrackInteractor
+import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.launch
 
 class FavoriteTrackViewModel(
@@ -33,6 +34,12 @@ class FavoriteTrackViewModel(
         }
     }
 
+    fun removeTrackFromPlaylist(track: Track) {
+        viewModelScope.launch {
+            favoriteTrackInteractor.deleteTrackIntoFavorite(track)
+        }
+    }
+
     fun clearFavorites() {
         viewModelScope.launch {
             favoriteTrackInteractor.clearFavorites()
@@ -40,6 +47,6 @@ class FavoriteTrackViewModel(
     }
 
     companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

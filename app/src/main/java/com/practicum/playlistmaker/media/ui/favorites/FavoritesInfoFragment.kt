@@ -26,14 +26,14 @@ import java.io.File
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class FavoritesInfoFragment: Fragment() {
+open class FavoritesInfoFragment: Fragment() {
 
     private var _binding: FragmentInfoFavoritesBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
 
-    private val viewModel by viewModel<FavoritesInfoViewModel>()
+    open val viewModel by viewModel<FavoritesInfoViewModel>()
 
-    private var selectedImageUri: Uri? = null
+    var selectedImageUri: Uri? = null
 
     val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         selectedImageUri = uri
@@ -89,7 +89,7 @@ class FavoritesInfoFragment: Fragment() {
         }
     }
 
-    private fun savePlaylist() {
+    open fun savePlaylist() {
         val name = binding.etName.text.toString().trim()
         val description = binding.etDescription.text?.toString()?.trim().orEmpty()
 
@@ -112,7 +112,7 @@ class FavoritesInfoFragment: Fragment() {
         Toast.makeText(requireContext(), R.string.playlist_created, Toast.LENGTH_SHORT).show()
     }
 
-    private fun copyImage(uri: Uri, fileName: String): String? {
+    fun copyImage(uri: Uri, fileName: String): String? {
         return try {
             val file = File(requireContext().filesDir, "playlist_images")
             if (!file.exists()) file.mkdirs()
@@ -131,7 +131,7 @@ class FavoritesInfoFragment: Fragment() {
         }
     }
 
-    private fun toSavedData(): Boolean {
+    fun toSavedData(): Boolean {
         val nameNotEmpty = !binding.etName.text.isNullOrEmpty()
         val descriptionNotEmpty = !binding.etDescription.text.isNullOrEmpty()
         val imageNotEmpty = selectedImageUri != null
@@ -139,16 +139,16 @@ class FavoritesInfoFragment: Fragment() {
         return nameNotEmpty || descriptionNotEmpty || imageNotEmpty
     }
 
-    private fun toShowDialog() {
+    fun toShowDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.playlist_complete) // Заголовок диалога
-            .setMessage(R.string.playlist_lost) // Описание диалога
-            .setNeutralButton(R.string.playlist_cancel) { dialog, which -> // Добавляет кнопку «Отмена»
-                // Действия, выполняемые при нажатии на кнопку «Отмена»
+            .setTitle(R.string.playlist_complete)
+            .setMessage(R.string.playlist_lost)
+            .setNeutralButton(R.string.playlist_cancel) { dialog, which ->
+
             }
-            .setPositiveButton(R.string.playlist_complete_btn) { dialog, which -> // Добавляет кнопку «Да»
+            .setPositiveButton(R.string.playlist_complete_btn) { dialog, which ->
                 hideKeyboard()
-                findNavController().navigateUp() // Действия, выполняемые при нажатии на кнопку «Да»
+                findNavController().navigateUp()
             }
             .show()
     }

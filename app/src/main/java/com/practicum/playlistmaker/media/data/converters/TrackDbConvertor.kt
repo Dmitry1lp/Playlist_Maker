@@ -35,6 +35,21 @@ class TrackDbConvertor {
         )
     }
 
+    fun mapFromFavorite(entity: TrackFavoriteEntity): Track {
+        return Track(
+            trackId = entity.trackId,
+            trackName = entity.trackName,
+            artistName = entity.artistName,
+            trackTime = formatTrackTime(entity.trackTimeMillis),
+            artworkUrl100 = entity.artworkUrl100,
+            previewUrl = entity.previewUrl,
+            collectionName = entity.collectionName,
+            releaseDate = entity.releaseDate,
+            primaryGenreName = entity.primaryGenreName,
+            country = entity.country,
+        )
+    }
+
     fun formatTrackTime(millis: Long): String {
         val totalSeconds = millis / 1000
         val minutes = totalSeconds / 60

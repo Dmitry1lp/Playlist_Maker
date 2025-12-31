@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
             bottomNavigationView.visibility = when (destination.id) {
                 R.id.favoritesInfoFragment -> View.GONE
                 R.id.playerFragment -> View.GONE
+                R.id.playlistFragment -> View.GONE
                 else -> View.VISIBLE
             }
         }

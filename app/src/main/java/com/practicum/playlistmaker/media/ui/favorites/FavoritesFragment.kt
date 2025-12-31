@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentMediaFavoritesBinding
 import com.practicum.playlistmaker.player.ui.PlayerFragment
@@ -38,9 +39,15 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        favoriteAdapter = FavoriteTrackAdapter(emptyList()) { track ->
-            onTrackClickDebounce(track)
-        }
+        favoriteAdapter = FavoriteTrackAdapter(
+            tracks = emptyList(),
+            onItemClick = { track ->
+                onTrackClickDebounce(track)
+            },
+            onLongClick = { track ->
+                showDeleteFromFavoritesDialog(track)
+            }
+        )
 
         binding.rvFavorites.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFavorites.adapter = favoriteAdapter
@@ -71,6 +78,16 @@ class FavoritesFragment : Fragment() {
                 }
             }
         }
+    }
+
+    fun showDeleteFromFavoritesDialog(track: Track) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_track_title)
+            .setNegativeButton(R.string.no, null)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                viewModel.removeTrackFromPlaylist(track)
+            }
+            .show()
     }
 
     override fun onDestroyView() {

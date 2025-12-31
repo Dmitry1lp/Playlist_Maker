@@ -8,7 +8,8 @@ import com.practicum.playlistmaker.search.domain.models.Track
 
 class FavoriteTrackAdapter(
     private var tracks: List<Track>,
-    private val onItemClick: (Track) -> Unit
+    private val onItemClick: (Track) -> Unit,
+    private val onLongClick: (Track) -> Unit
 ) : RecyclerView.Adapter<FavoritesTrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoritesTrackViewHolder {
@@ -21,6 +22,10 @@ class FavoriteTrackAdapter(
         holder.bind(track)
         holder.itemView.setOnClickListener {
             onItemClick(track)
+        }
+        holder.itemView.setOnLongClickListener {
+            onLongClick(track)
+            true
         }
     }
 

@@ -31,11 +31,11 @@ val repositoryModule = module {
     }
 
     factory<FavoriteTracksRepository> {
-        FavoriteTrackRepositoryImpl(get<AppDatabase>().trackDao(), get())
+        FavoriteTrackRepositoryImpl(get<AppDatabase>().trackFavoriteDao(), get())
     }
 
     factory<PlaylistRepository> {
-        PlaylistRepositoryImpl(get<AppDatabase>().playlistDao(),get<AppDatabase>().trackFavoriteDao(),get())
+        PlaylistRepositoryImpl(get<AppDatabase>().playlistDao(),get<AppDatabase>().trackDao(),get<AppDatabase>().trackFavoriteDao(),get())
     }
 
     factory { TrackDbConvertor() }
