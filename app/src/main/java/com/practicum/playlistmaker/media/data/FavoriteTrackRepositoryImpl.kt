@@ -4,6 +4,7 @@ import com.practicum.playlistmaker.media.data.converters.TrackDbConvertor
 import com.practicum.playlistmaker.media.data.db.AppDatabase
 import com.practicum.playlistmaker.media.data.db.TrackDao
 import com.practicum.playlistmaker.media.data.db.TrackEntity
+import com.practicum.playlistmaker.media.data.db.TrackFavoriteDao
 import com.practicum.playlistmaker.media.domain.FavoriteTracksRepository
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
@@ -11,39 +12,30 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class FavoriteTrackRepositoryImpl(
-    private val trackDao: TrackDao,
+    private val trackFavoriteDao: TrackFavoriteDao,
     private val trackDbConvertor: TrackDbConvertor
 ): FavoriteTracksRepository {
 
     override suspend fun addTrackToFavorite(track: Track) {
         track.isFavorite = true
-        val trackEntity = convertFromTrack(track).copy(
+        val trackEntity = trackDbConvertor.mapToFavorite(track).copy(
             addedAt = System.currentTimeMillis()
         )
-        trackDao.insertTrack(trackEntity)
+        trackFavoriteDao.insertTrack(trackEntity)
     }
 
     override suspend fun deleteTrackIntoFavorite(track: Track) {
         track.isFavorite = false
-        val trackEntity = convertFromTrack(track)
-        trackDao.deleteTrackEntity(trackEntity)
+        trackFavoriteDao.deleteTrackEntity(track.trackId)
     }
 
     override fun getFavoriteTrack(): Flow<List<Track>> =
-        trackDao.getTracks().map { tracks ->
-                convertFromTrackEntity(tracks)
-    }
-
-    private fun convertFromTrackEntity(tracks: List<TrackEntity>): List<Track> {
-        return tracks.map { trackDbConvertor.map(it) }
-    }
-
-    private fun convertFromTrack(track: Track): TrackEntity {
-        return trackDbConvertor.map(track)
-    }
+        trackFavoriteDao.getFavoriteTracks().map { favoriteEntities ->
+            favoriteEntities.map { trackDbConvertor.mapFromFavorite(it) }
+        }
 
     override suspend fun clearFavorites() {
-        trackDao.clearAll()
+        trackFavoriteDao.clearAll()
     }
 
 }

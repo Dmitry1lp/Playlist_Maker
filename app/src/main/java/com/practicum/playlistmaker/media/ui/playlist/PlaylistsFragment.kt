@@ -14,8 +14,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
 
-    private lateinit var playlistAdapter: PlaylistAdapter
-    private val viewModel by viewModel<PlaylistViewModel>()
+    private lateinit var playlistAdapter: PlaylistsAdapter
+    private val viewModel by viewModel<PlaylistsViewModel>()
 
     private var _binding: FragmentMediaPlaylistsBinding? = null
     private val binding get() = _binding!!
@@ -32,7 +32,9 @@ class PlaylistsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        playlistAdapter = PlaylistAdapter(emptyList())
+        playlistAdapter = PlaylistsAdapter(emptyList()) { playlist ->
+            viewModel.onPlaylistClicked(playlist.id)
+        }
 
         binding.rvRecyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvRecyclerView.adapter = playlistAdapter
@@ -43,15 +45,27 @@ class PlaylistsFragment : Fragment() {
             )
         }
 
+        viewModel.observeOpenPlaylist().observe(viewLifecycleOwner) { playlistId ->
+            playlistId?.let {
+                findNavController().navigate(
+                    R.id.action_mediaFragment2_to_playlistFragment,
+                    Bundle().apply {
+                        putLong(KEY_PLAYLIST_ID, it)
+                    }
+                )
+                viewModel.observeOpenPlaylist().value = null
+            }
+        }
+
         viewModel.observePlaylistUiState.observe(viewLifecycleOwner){ state ->
             when(state) {
-                is PlaylistUiState.Content -> {
+                is PlaylistsUiState.Content -> {
                     playlistAdapter.update(state.playlists)
                     binding.rvRecyclerView.visibility = View.VISIBLE
                     binding.ivPlaceholderMedia.visibility = View.GONE
                     binding.tvPlaylistPlaceholder.visibility = View.GONE
                 }
-                is PlaylistUiState.Empty -> {
+                is PlaylistsUiState.Empty -> {
                     binding.rvRecyclerView.visibility = View.GONE
                     binding.ivPlaceholderMedia.visibility = View.VISIBLE
                     binding.tvPlaylistPlaceholder.visibility = View.VISIBLE
@@ -66,7 +80,7 @@ class PlaylistsFragment : Fragment() {
     }
 
     companion object {
-
+        private const val KEY_PLAYLIST_ID = "KEY_PLAYLIST_ID"
         fun newInstance() = PlaylistsFragment()
     }
 }

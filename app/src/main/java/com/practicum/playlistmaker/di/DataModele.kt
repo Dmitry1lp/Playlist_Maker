@@ -68,4 +68,10 @@ val dataModule = module {
             .fallbackToDestructiveMigration()
             .build()
     }
+
+    single { get<AppDatabase>().playlistDao() }
+
+    single { get<AppDatabase>().trackDao() }
+
+    single { get<AppDatabase>().trackFavoriteDao() }
 }

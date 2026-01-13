@@ -3,13 +3,12 @@ package com.practicum.playlistmaker.media.ui.playlist
 import android.util.TypedValue
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.PlaylistViewBinding
 import com.practicum.playlistmaker.media.domain.playlist.model.Playlist
 import java.io.File
 
-class PlaylistViewHolder(private val binding: PlaylistViewBinding): RecyclerView.ViewHolder(binding.root) {
+class PlaylistsViewHolder(private val binding: PlaylistViewBinding): RecyclerView.ViewHolder(binding.root) {
 
     private val cornerRadius by lazy {
         TypedValue.applyDimension(

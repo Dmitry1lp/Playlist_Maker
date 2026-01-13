@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class FavoritesInfoViewModel(
+open class FavoritesInfoViewModel(
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<CreatePlaylistState>(CreatePlaylistState.Empty)
+    val _state = MutableStateFlow<CreatePlaylistState>(CreatePlaylistState.Empty)
     val state: StateFlow<CreatePlaylistState> = _state
 
-    fun createPlaylist(playlist: Playlist) {
+    open fun createPlaylist(playlist: Playlist) {
         viewModelScope.launch {
             _state.value = CreatePlaylistState.Loading
 

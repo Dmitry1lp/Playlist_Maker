@@ -41,6 +41,22 @@
     <string name="playlist_lost" translatable="false">Все несохраненные данные будут потеряны</string>
     <string name="playlist_complete_btn" translatable="false">Завершить</string>
     <string name="error" translatable="false">Ошибка</string>
+    <string name="playlist_name" translatable="false">Название плейлиста</string>
+    <string name="playlist_description" translatable="false">Описание плейлиста</string>
+    <string name="playlist_duration" translatable="false">300 минут</string>
+    <string name="playlist_count_track" translatable="false">300 треков</string>
+    <string name="delete_track_title" translatable="false">Хотите удалить трек?</string>
+    <string name="shared" translatable="false">Поделиться</string>
+    <string name="edit" translatable="false">Редактировать информацию</string>
+    <string name="delete" translatable="false">Удалить плейлист</string>
+    <string name="no" translatable="false">Нет</string>
+    <string name="yes" translatable="false">Да</string>
+    <string name="delete_playlist_title" translatable="false">Удалить плейлист</string>
+    <string name="delete_playlist_message" translatable="false">Вы уверены, что хотите удалить этот плейлист?</string>
+    <string name="cancel" translatable="false">Отмена</string>
+    <string name="delete_btn" translatable="false">Удалить</string>
+    <string name="edit_playlist_title" translatable="false">Редактировать</string>
+    <string name="edit_playlist_save_button" translatable="false">Сохранить</string>
 
     <plurals name="tracks_count" translatable="false">
         <item quantity="one">%d трек</item>
@@ -48,5 +64,13 @@
         <item quantity="many">%d треков</item>
         <item quantity="other">%d трека</item>
     </plurals>
+
+    <plurals name="tracks_duration" translatable="false">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="many">%d минут</item>
+        <item quantity="other">%d минуты</item>
+    </plurals>
+
 
 </resources>
