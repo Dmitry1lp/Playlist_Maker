@@ -229,16 +229,18 @@
             app:layout_constraintStart_toStartOf="@id/gl_leftBorder"
             app:layout_constraintTop_toTopOf="@+id/ib_play_button" />
 
-        <ImageButton
+        <com.practicum.playlistmaker.player.ui.PlaybackButtonView
             android:id="@+id/ib_play_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/edit_search"
             android:background="?attr/colorOnPrimary"
             android:src="@drawable/play_button"
+            app:playView="@drawable/play_button"
+            app:pauseView="@drawable/paused_button"
             app:layout_constraintBottom_toTopOf="@+id/tv_time_indicator"
             app:layout_constraintEnd_toStartOf="@+id/ib_like_button"
-            app:layout_constraintStart_toEndOf="@+id/ib_add_button" />
+            app:layout_constraintStart_toEndOf="@+id/ib_add_button"/>
 
         <ImageButton
             android:id="@+id/ib_like_button"

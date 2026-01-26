@@ -18,6 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
+import com.practicum.playlistmaker.media.ui.extensions.loadPlaylistCover
 import com.practicum.playlistmaker.media.ui.favorites.FavoriteTrackAdapter
 import com.practicum.playlistmaker.player.ui.PlayerFragment
 import com.practicum.playlistmaker.search.domain.models.Track
@@ -50,46 +51,12 @@ class PlaylistFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-            // менюшка
-        menuBottomSheetBehavior = BottomSheetBehavior.from(binding.menuBottomSheet)
-        menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
-        menuBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        binding.overlay.visibility = View.GONE
-                    }
-                    else -> {
-                        binding.overlay.visibility = View.VISIBLE
-                    }
-                }
-            }
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-        })
-        //обрабатываем нажатие
-        binding.ibMenu.setOnClickListener {
-            menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            binding.overlay.visibility = View.VISIBLE
-        }
-        //обработчик нажатия на оверлей
-        binding.overlay.setOnClickListener {
-            menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            binding.overlay.visibility = View.GONE
-        }
+        setupMenuBottomSheets()
+        setupShareButtons()
 
         binding.ivBackButton.setOnClickListener {
             findNavController().navigateUp()
-        }
-
-        binding.ibShare.setOnClickListener {
-            viewModel.sharedPlaylist()
-        }
-
-        binding.btnShared.setOnClickListener {
-            viewModel.sharedPlaylist()
         }
 
         binding.btnEdit.setOnClickListener {
@@ -105,8 +72,7 @@ class PlaylistFragment: Fragment() {
         }
 
         binding.btnDelete.setOnClickListener {
-            menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            binding.overlay.visibility = View.GONE
+            hideMenu()
             showDeletePlaylistDialog()
         }
 
@@ -137,7 +103,6 @@ class PlaylistFragment: Fragment() {
 
         viewModel.loadPlaylist(playlistId)
 
-
         viewModel.observeSharedPlaylist().observe(viewLifecycleOwner) { text ->
             text?.let {
                 val sendIntent = Intent(Intent.ACTION_SEND).apply {
@@ -161,56 +126,20 @@ class PlaylistFragment: Fragment() {
                 binding.tvDescription.text = pl.description
                 binding.tvCountTrack.text = resources.getQuantityString(R.plurals.tracks_count,pl.trackCount,pl.trackCount)
 
-                val coverPath = pl.filePath
-                if (coverPath != null) {
-                    val coverFile = File(coverPath)
-                    if (coverFile.exists()) {
-                        Glide.with(this@PlaylistFragment)
-                            .load(coverFile)
-                            .placeholder(R.drawable.ic_placeholder)
-                            .error(R.drawable.ic_placeholder)
-                            .centerCrop()
-                            .apply(
-                                RequestOptions().transform(
-                                RoundedCorners(
-                                    resources.getDimensionPixelSize(R.dimen.radiusSize_16dp)
-                                )))
-                            .into(binding.ivAlbum)
-                    } else {
-                        Glide.with(this@PlaylistFragment)
-                            .load(R.drawable.ic_placeholder)
-                            .into(binding.ivAlbum)
-                    }
-                } else {
-                    Glide.with(this@PlaylistFragment)
-                        .load(R.drawable.ic_placeholder)
-                        .into(binding.ivAlbum)
-                }
+                val radius = resources.getDimensionPixelSize(R.dimen.radiusSize_16dp)
+
+                binding.ivAlbum.loadPlaylistCover(
+                    filePath = playlist.filePath,
+                    cornerRadius = radius
+                )
 
                 binding.tvMenuTitle.text = pl.name
                 binding.tvMenuCount.text = resources.getQuantityString(R.plurals.tracks_count,pl.trackCount,pl.trackCount)
 
-                val menuPath = pl.filePath
-                if (menuPath != null) {
-                    val menuFile = File(menuPath)
-                    if(menuFile.exists()) {
-                        Glide.with(this@PlaylistFragment)
-                            .load(menuFile)
-                            .placeholder(R.drawable.ic_placeholder)
-                            .error(R.drawable.ic_placeholder)
-                            .centerCrop()
-                            .apply(
-                                RequestOptions().transform(
-                                    RoundedCorners(
-                                        resources.getDimensionPixelSize(R.dimen.radiusSize_16dp)
-                                    )))
-                            .into(binding.ivMenuCover)
-                    } else {
-                        binding.ivMenuCover.setImageResource(R.drawable.ic_placeholder)
-                    }
-                } else {
-                    binding.ivMenuCover.setImageResource(R.drawable.ic_placeholder)
-                }
+                binding.ivMenuCover.loadPlaylistCover(
+                    filePath = playlist.filePath,
+                    cornerRadius = radius
+                )
             }
         }
 
@@ -233,6 +162,48 @@ class PlaylistFragment: Fragment() {
             findNavController().navigateUp()
         }
     }
+
+    private fun setupMenuBottomSheets() {
+        menuBottomSheetBehavior = BottomSheetBehavior.from(binding.menuBottomSheet)
+        menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        menuBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.visibility = View.GONE
+                    }
+                    else -> {
+                        binding.overlay.visibility = View.VISIBLE
+                    }
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
+        binding.ibMenu.setOnClickListener { showMenu() }
+        binding.overlay.setOnClickListener { hideMenu() }
+    }
+
+    private fun showMenu() {
+        menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        binding.overlay.visibility = View.VISIBLE
+    }
+
+    private fun hideMenu() {
+        menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        binding.overlay.visibility = View.GONE
+    }
+
+    private fun setupShareButtons() {
+        val shareClickListener = View.OnClickListener {
+            viewModel.sharedPlaylist()
+        }
+        binding.ibShare.setOnClickListener(shareClickListener)
+        binding.btnShared.setOnClickListener(shareClickListener)
+    }
+
 
     private fun showDeletePlaylistDialog() {
         MaterialAlertDialogBuilder(requireContext())

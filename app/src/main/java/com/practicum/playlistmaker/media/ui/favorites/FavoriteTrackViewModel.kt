@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.media.domain.db.FavoriteTrackInteractor
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class FavoriteTrackViewModel(
@@ -15,6 +16,8 @@ class FavoriteTrackViewModel(
     init {
         getFavoriteTracks()
     }
+
+    private var removeJob: Job? = null
 
     val clickDebounceDelay get() = CLICK_DEBOUNCE_DELAY
 
@@ -35,8 +38,14 @@ class FavoriteTrackViewModel(
     }
 
     fun removeTrackFromPlaylist(track: Track) {
-        viewModelScope.launch {
-            favoriteTrackInteractor.deleteTrackIntoFavorite(track)
+        if (removeJob?.isActive == true) return
+
+        removeJob = viewModelScope.launch {
+            try {
+                favoriteTrackInteractor.deleteTrackIntoFavorite(track)
+            } finally {
+                removeJob = null
+            }
         }
     }
 

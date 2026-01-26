@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id ("kotlin-parcelize")
     alias(libs.plugins.navigation.safe.args)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -28,11 +29,14 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isMinifyEnabled = false
         }
     }
     compileOptions {
@@ -50,6 +54,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.koin.android)
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+    implementation("com.google.firebase:firebase-analytics")
 
     implementation("com.google.android.material:material:1.9.0")
 
