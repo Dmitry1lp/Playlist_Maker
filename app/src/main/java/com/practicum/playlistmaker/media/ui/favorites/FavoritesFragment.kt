@@ -62,25 +62,33 @@ class FavoritesFragment : Fragment() {
             )
         }
 
-        viewModel.observeFavoritesUiState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is FavoritesUiState.Content -> {
-                    binding.rvFavorites.visibility = View.VISIBLE
-                    binding.ivPlaceholder.visibility = View.GONE
-                    binding.tvPlaceholder.visibility = View.GONE
-                    favoriteAdapter.update(state.tracks)
-                }
-
-                is FavoritesUiState.Empty -> {
-                    binding.rvFavorites.visibility = View.GONE
-                    binding.ivPlaceholder.visibility = View.VISIBLE
-                    binding.tvPlaceholder.visibility = View.VISIBLE
-                }
-            }
+        viewModel.observeFavoritesUiState.observe(viewLifecycleOwner) {
+            renderState(it)
         }
     }
 
-    fun showDeleteFromFavoritesDialog(track: Track) {
+    private fun renderState(state: FavoritesUiState) {
+        when (state) {
+            is FavoritesUiState.Content -> showContent(state.tracks)
+            is FavoritesUiState.Empty -> showEmpty()
+        }
+    }
+
+    private fun showContent(tracks: List<Track>) {
+        binding.rvFavorites.visibility = View.VISIBLE
+        binding.ivPlaceholder.visibility = View.GONE
+        binding.tvPlaceholder.visibility = View.GONE
+        favoriteAdapter.update(tracks)
+    }
+
+    private fun showEmpty() {
+        binding.rvFavorites.visibility = View.GONE
+        binding.ivPlaceholder.visibility = View.VISIBLE
+        binding.tvPlaceholder.visibility = View.VISIBLE
+    }
+
+
+    private fun showDeleteFromFavoritesDialog(track: Track) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.delete_track_title)
             .setNegativeButton(R.string.no, null)
@@ -98,6 +106,5 @@ class FavoritesFragment : Fragment() {
     companion object {
 
         fun newInstance() = FavoritesFragment()
-
     }
 }

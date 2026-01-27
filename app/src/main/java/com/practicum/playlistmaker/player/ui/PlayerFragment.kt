@@ -11,6 +11,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.logEvent
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioplayerBinding
 import com.practicum.playlistmaker.media.ui.media.MediaAdapter
@@ -50,6 +52,8 @@ class PlayerFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val analytics = FirebaseAnalytics.getInstance(requireContext())
+
         adapterBottomSheet = MediaAdapter(playlists = emptyList()) { playlist ->
             viewModel.onAddTrackToPlaylistClicked(playlist)
         }
@@ -64,6 +68,10 @@ class PlayerFragment: Fragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         binding.ibAddButton.setOnClickListener {
+            analytics.logEvent("Test_event") {
+                param("TestValue", 123)
+                param("Name", "Cool")
+            }
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
@@ -105,16 +113,10 @@ class PlayerFragment: Fragment() {
             binding.tvTimeIndicator.text = state.progress
 
             // Меняем кнопку в зависимости от состояния
-            when (state) {
-                is PlayerState.Playing -> {
-                    binding.ibPlayButton.setImageResource(R.drawable.paused_button)
-                }
-                is PlayerState.Paused,
-                is PlayerState.Prepared,
-                is PlayerState.Default -> {
-                    binding.ibPlayButton.setImageResource(R.drawable.play_button)
-                }
-            }
+            binding.ibPlayButton.setPlaying(
+                state is PlayerState.Playing
+            )
+
             binding.ibPlayButton.isEnabled = state.isPlayButtonEnabled
         }
 
@@ -138,7 +140,7 @@ class PlayerFragment: Fragment() {
             findNavController().navigateUp()
         }
         // Обработка нажатия кнопки Play
-        binding.ibPlayButton.setOnClickListener {
+        binding.ibPlayButton.onButtonClick = {
             viewModel.onPlayButtonClicked()
         }
         //Обработка нажатия кнопки Like

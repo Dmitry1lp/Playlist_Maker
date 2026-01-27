@@ -14,6 +14,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.media.domain.playlist.model.Playlist
+import com.practicum.playlistmaker.media.ui.extensions.loadPlaylistCover
 import com.practicum.playlistmaker.media.ui.favorites.CreatePlaylistState
 import com.practicum.playlistmaker.media.ui.favorites.FavoritesInfoFragment
 import kotlinx.coroutines.launch
@@ -57,6 +58,11 @@ class EditPlaylistFragment: FavoritesInfoFragment() {
             }
         }
 
+        binding.ibImage.apply {
+            outlineProvider = ViewOutlineProvider.BACKGROUND
+            clipToOutline = true
+        }
+
         viewModel.name.observe(viewLifecycleOwner) { name ->
             binding.etName.setText(name)
         }
@@ -66,25 +72,9 @@ class EditPlaylistFragment: FavoritesInfoFragment() {
         }
 
         viewModel.coverPath.observe(viewLifecycleOwner) { path ->
-            if (path != null) {
-                val file = File(path)
-                if (file.exists()) {
-                    Glide.with(requireContext())
-                        .load(file)
-                        .placeholder(R.drawable.ic_placeholder)
-                        .error(R.drawable.ic_placeholder)
-                        .centerCrop()
-                        .apply(
-                        RequestOptions().transform(
-                            RoundedCorners(
-                                resources.getDimensionPixelSize(R.dimen.radiusSize_16dp)
-                            )))
-                        .into(binding.ibImage)
-
-                    binding.ibImage.outlineProvider = ViewOutlineProvider.BACKGROUND
-                    binding.ibImage.clipToOutline = true
-                }
-            }
+            binding.ibImage.loadPlaylistCover(path,
+                resources.getDimensionPixelSize(R.dimen.radiusSize_16dp)
+            )
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -123,5 +113,4 @@ class EditPlaylistFragment: FavoritesInfoFragment() {
             viewModel.createPlaylist(playlist)
         }
     }
-
 }

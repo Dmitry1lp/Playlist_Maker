@@ -47,6 +47,7 @@ class PlayerViewModel(
             val favorites = favoriteTrackInteractor.getFavoriteTrack().first()
             val isFav = favorites.any { it.trackId == track.trackId }
             val updatedTrack = track.copy(isFavorite = isFav)
+            currentTrack = updatedTrack
             playerStateLiveData.postValue(PlayerUiState(track = updatedTrack, isLiked = isFav))
         }
         preparePlayer()
