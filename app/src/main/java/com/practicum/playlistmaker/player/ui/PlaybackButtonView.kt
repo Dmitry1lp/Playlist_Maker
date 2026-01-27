@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.RectF
 import android.view.MotionEvent
 import androidx.core.graphics.drawable.toBitmap
+import android.graphics.drawable.Drawable
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import com.practicum.playlistmaker.R
@@ -20,8 +21,8 @@ class PlaybackButtonView @JvmOverloads constructor(
     @StyleRes defStyleRes: Int = 0,
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val playBitmap: Bitmap?
-    private val pauseBitmap: Bitmap?
+    private var playDrawable: Drawable? = null
+    private var pauseDrawable: Drawable? = null
     private var isPlaying = false
     var onButtonClick: (() -> Unit)? = null
 
@@ -35,8 +36,8 @@ class PlaybackButtonView @JvmOverloads constructor(
             defStyleRes
         ).apply {
             try {
-                playBitmap = getDrawable(R.styleable.PlaybackButtonView_playView)?.toBitmap()
-                pauseBitmap = getDrawable(R.styleable.PlaybackButtonView_pauseView)?.toBitmap()
+                playDrawable = getDrawable(R.styleable.PlaybackButtonView_playView)
+                pauseDrawable = getDrawable(R.styleable.PlaybackButtonView_pauseView)
             } finally {
                 recycle()
             }
@@ -57,7 +58,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val desiredSize = playBitmap?.width ?: 120
+        val desiredSize = playDrawable?.intrinsicWidth ?: 120
 
         val width = resolveSize(desiredSize, widthMeasureSpec)
         val height = resolveSize(desiredSize, heightMeasureSpec)
@@ -71,14 +72,17 @@ class PlaybackButtonView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        val bitmap = if (isPlaying) pauseBitmap else playBitmap
-        bitmap?.let {
-            canvas.drawBitmap(it, null, imageRect, null)
+        val image = if (isPlaying) pauseDrawable else playDrawable
+        image?.let {
+            it.setBounds(0,0,width,height)
+            it.draw(canvas)
         }
     }
 
     fun setPlaying(playing: Boolean) {
-        isPlaying = playing
-        invalidate()
+        if(isPlaying != playing) {
+            isPlaying = playing
+            invalidate()
+        }
     }
 }
