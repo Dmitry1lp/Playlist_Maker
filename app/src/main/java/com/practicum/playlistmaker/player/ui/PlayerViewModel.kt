@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.player.ui
 
+import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +13,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.practicum.playlistmaker.media.domain.db.FavoriteTrackInteractor
 import com.practicum.playlistmaker.media.domain.db.PlaylistInteractor
 import com.practicum.playlistmaker.media.domain.playlist.model.Playlist
+import com.practicum.playlistmaker.player.domain.AudioPlayerControl
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -37,10 +40,10 @@ class PlayerViewModel(
     private val _addTrack = MutableLiveData<AddTrack>()
     val observeAddTrack: LiveData<AddTrack> = _addTrack
 
+    private var audioPlayerControl: AudioPlayerControl? = null
 
-    private var mediaPlayer = MediaPlayer()
     private var currentTrack: Track = track
-    private var timerJob: Job? = null
+
 
     init {
         viewModelScope.launch {
@@ -50,19 +53,29 @@ class PlayerViewModel(
             currentTrack = updatedTrack
             playerStateLiveData.postValue(PlayerUiState(track = updatedTrack, isLiked = isFav))
         }
-        preparePlayer()
         getPlaylists()
     }
 
     fun onPlayButtonClicked() {
         when(playerState.value) {
             is PlayerState.Playing -> {
-                pausePlayer()
+                audioPlayerControl?.pausePlayer()
             }
             is PlayerState.Prepared, is PlayerState.Paused -> {
-                startPlayer()
+                audioPlayerControl?.startPlayer()
             }
             else -> { }
+        }
+    }
+
+    fun setAudioPlayerControl(audioPlayerControl: AudioPlayerControl) {
+        this.audioPlayerControl = audioPlayerControl
+        audioPlayerControl.setTrack(currentTrack)
+
+        viewModelScope.launch {
+            audioPlayerControl.getPlayerState().collect {
+                playerState.postValue(it)
+            }
         }
     }
 
@@ -99,27 +112,6 @@ class PlayerViewModel(
         }
     }
 
-    private fun preparePlayer() {
-        val track = currentTrack ?: return
-        track.previewUrl?.let { url ->
-            try {
-                mediaPlayer.reset()
-                mediaPlayer.setDataSource(url)
-                mediaPlayer.prepareAsync()
-                mediaPlayer.setOnPreparedListener {
-                    playerState.postValue(PlayerState.Prepared())
-                }
-                mediaPlayer.setOnCompletionListener {
-                    playerState.postValue(PlayerState.Prepared())
-                    timerJob?.cancel()
-                    playerState.postValue(PlayerState.Prepared())
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
     fun onAddTrackToPlaylistClicked(playlist: Playlist) {
         if (playlist.trackId.contains(currentTrack.trackId)) {
             _addTrack.postValue(AddTrack.NotAdded)
@@ -132,57 +124,17 @@ class PlayerViewModel(
         }
     }
 
-
-    private fun startTimer() {
-        timerJob = viewModelScope.launch {
-            while (mediaPlayer.isPlaying) {
-                delay(300L)
-                playerState.postValue(PlayerState.Playing(getCurrentPlayerPosition()))
-            }
-        }
-    }
-
-    private fun startPlayer() {
-        mediaPlayer.start()
-        playerState.postValue(PlayerState.Playing(getCurrentPlayerPosition()))
-        startTimer()
-    }
-
-    private fun pausePlayer() {
-        mediaPlayer.pause()
-        timerJob?.cancel()
-        playerState.postValue(PlayerState.Paused(getCurrentPlayerPosition()))
-    }
-
-    private fun releasePlayer() {
-        if (mediaPlayer.isPlaying) mediaPlayer.stop()
-        mediaPlayer.release()
-        playerState.value = PlayerState.Default()
-    }
-
-    private fun getCurrentPlayerPosition(): String {
-        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition) ?: "00:00"
-    }
-
-    fun onPause() {
-        pausePlayer()
-    }
-
-    fun onDestroy() {
-        mediaPlayer.release()
-    }
-
     override fun onCleared() {
         super.onCleared()
-        releasePlayer()
+        audioPlayerControl = null
+    }
+
+    fun removeAudioPlayerControl() {
+        audioPlayerControl = null
     }
 
     companion object {
 
-        fun getFactory(track: Track, favoriteTrackInteractor: FavoriteTrackInteractor, playlistInteractor: PlaylistInteractor): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                PlayerViewModel(track, favoriteTrackInteractor, playlistInteractor)
-            }
-        }
+
     }
 }

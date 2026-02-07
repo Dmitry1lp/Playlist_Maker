@@ -1,11 +1,11 @@
 [versions]
 activityKtx = "1.11.0"
-agp = "8.13.2"
+agp = "9.0.0"
 glide = "4.14.2"
 googleMaterial = "1.6.1"
 googleMaterialVersion = "1.11.0"
 koinAndroid = "4.1.1"
-kotlin = "2.1.21"
+kotlin = "2.2.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
