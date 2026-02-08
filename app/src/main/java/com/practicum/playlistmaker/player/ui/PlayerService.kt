@@ -23,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -37,6 +38,8 @@ internal class PlayerService: Service(), AudioPlayerControl {
 
     private val _playerState = MutableStateFlow<PlayerState>(PlayerState.Default())
     private val playerState = _playerState.asStateFlow()
+
+    private var isAppForeground = true
 
     override fun onBind(intent: Intent?): IBinder? {
         return binder
@@ -55,7 +58,6 @@ internal class PlayerService: Service(), AudioPlayerControl {
     override fun onDestroy() {
         super.onDestroy()
         releasePlayer()
-
     }
 
     private fun createNotificationChannel() {
@@ -66,10 +68,10 @@ internal class PlayerService: Service(), AudioPlayerControl {
 
         val channel = NotificationChannel(
             /* id= */ NOTIFICATION_CHANNEL_ID,
-            /* name= */ "Music service",
+            /* name= */ getString(R.string.music_service),
             /* importance= */ NotificationManager.IMPORTANCE_DEFAULT
         )
-        channel.description = "Service for playing music"
+        channel.description = getString(R.string.music_service_description)
 
         // Регистрируем канал уведомлений
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -81,7 +83,7 @@ internal class PlayerService: Service(), AudioPlayerControl {
         val contentText = if (currentTrack != null) {
             "${currentTrack!!.artistName} — ${currentTrack!!.trackName}"
         } else {
-            "Подготовка воспроизведения"
+            getString(R.string.load_service)
         }
             return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(getString(R.string.app_name))
@@ -101,26 +103,27 @@ internal class PlayerService: Service(), AudioPlayerControl {
     }
 
     private fun startTimer() {
+        timerJob?.cancel()
         timerJob = CoroutineScope(Dispatchers.Default).launch {
             while (mediaPlayer?.isPlaying == true) {
-                delay(300L)
-                _playerState.value = PlayerState.Playing(getCurrentPlayerPosition())
+                delay(DELAY_TIMER)
+                _playerState.update { PlayerState.Playing(getCurrentPlayerPosition()) }
             }
         }
     }
 
     override fun startPlayer() {
         mediaPlayer?.start()
-        _playerState.value = PlayerState.Playing(getCurrentPlayerPosition())
+        _playerState.update { PlayerState.Playing(getCurrentPlayerPosition())  }
         startTimer()
-        enterForeground()
+        updateNotification()
     }
 
     override fun pausePlayer() {
         mediaPlayer?.pause()
         timerJob?.cancel()
-        _playerState.value = PlayerState.Paused(getCurrentPlayerPosition())
-        exitForeground()
+        _playerState.update{ PlayerState.Paused(getCurrentPlayerPosition()) }
+        updateNotification()
     }
 
     override fun setTrack(track: Track) {
@@ -130,11 +133,11 @@ internal class PlayerService: Service(), AudioPlayerControl {
         mediaPlayer?.setDataSource(track.previewUrl)
         mediaPlayer?.prepareAsync()
         mediaPlayer?.setOnPreparedListener {
-            _playerState.value = PlayerState.Prepared()
+            _playerState.update{ PlayerState.Prepared() }
         }
         mediaPlayer?.setOnCompletionListener {
             timerJob?.cancel()
-            _playerState.value = PlayerState.Prepared()
+            _playerState.update{ PlayerState.Prepared() }
             exitForeground()
         }
     }
@@ -160,7 +163,20 @@ internal class PlayerService: Service(), AudioPlayerControl {
         if (mediaPlayer?.isPlaying == false) mediaPlayer?.stop()
         timerJob?.cancel()
         mediaPlayer?.release()
-        _playerState.value = PlayerState.Default()
+        _playerState.update { PlayerState.Default() }
+    }
+
+    fun setAppForeground(isForeground: Boolean) {
+        isAppForeground = isForeground
+        updateNotification()
+    }
+
+    private fun updateNotification() {
+        if (!isAppForeground && mediaPlayer?.isPlaying == true) {
+            enterForeground()
+        } else {
+            exitForeground()
+        }
     }
 
     private fun getCurrentPlayerPosition(): String {
@@ -172,7 +188,7 @@ internal class PlayerService: Service(), AudioPlayerControl {
     }
 
     private companion object {
-        const val LOG_TAG = "PlayerService"
+        const val DELAY_TIMER = 300L
         const val NOTIFICATION_CHANNEL_ID = "player_service_channel"
         const val SERVICE_NOTIFICATION_ID = 100
     }

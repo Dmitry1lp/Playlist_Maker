@@ -208,6 +208,7 @@ class PlayerFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        playerService?.setAppForeground(true)
 
         ContextCompat.registerReceiver(
             requireContext(),
@@ -215,6 +216,11 @@ class PlayerFragment: Fragment() {
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
             ContextCompat.RECEIVER_NOT_EXPORTED,
         )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        playerService?.setAppForeground(false)
     }
 
     override fun onDestroyView() {
