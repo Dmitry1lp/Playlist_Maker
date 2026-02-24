@@ -1,12 +1,23 @@
 package com.practicum.playlistmaker.player.ui
 
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.ServiceConnection
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -17,6 +28,8 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioplayerBinding
 import com.practicum.playlistmaker.media.ui.media.MediaAdapter
 import com.practicum.playlistmaker.search.domain.models.Track
+import com.practicum.playlistmaker.utils.BroadcastReceiverConnection
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -24,8 +37,26 @@ class PlayerFragment: Fragment() {
 
     private var _binding: FragmentAudioplayerBinding? = null
     private val binding get() = _binding!!
+    private val connectionReceiver = BroadcastReceiverConnection()
 
     private lateinit var adapterBottomSheet: MediaAdapter
+
+    private var playerService: PlayerService? = null
+
+    private var playerState: PlayerState = PlayerState.Default()
+
+    private val serviceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as PlayerService.PlayerServiceBinder
+            playerService = binder.getService()
+            viewModel.setAudioPlayerControl(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            viewModel.removeAudioPlayerControl()
+        }
+    }
 
     private val track: Track by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -51,6 +82,16 @@ class PlayerFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            // На версиях ниже Android 13 —
+            // можно сразу стартовать сервис.
+            startPlayerService()
+        }
+
+        bindPlayerService()
 
         val analytics = FirebaseAnalytics.getInstance(requireContext())
 
@@ -165,19 +206,59 @@ class PlayerFragment: Fragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.onPause()
+    override fun onResume() {
+        super.onResume()
+        playerService?.setAppForeground(true)
+
+        ContextCompat.registerReceiver(
+            requireContext(),
+            connectionReceiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.onDestroy()
+    override fun onPause() {
+        super.onPause()
+        playerService?.setAppForeground(false)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDestroy() {
+        unbindPlayerService()
+        super.onDestroy()
+    }
+
+    private fun bindPlayerService() {
+        val intent = Intent(requireContext(), PlayerService::class.java)
+
+        requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun unbindPlayerService() {
+        requireContext().unbindService(serviceConnection)
+    }
+
+    // Описали обработчик разрешения
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Если выдали разрешение — запускаем сервис.
+            startPlayerService()
+        } else {
+            // Иначе просто покажем ошибку
+            Toast.makeText(requireContext(), "Can't start foreground service!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun startPlayerService() {
+        val intent = Intent(requireContext(), PlayerService::class.java)
+        ContextCompat.startForegroundService(requireContext().applicationContext, intent)
     }
 
     companion object {

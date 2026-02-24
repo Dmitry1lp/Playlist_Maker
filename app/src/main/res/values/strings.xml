@@ -57,6 +57,9 @@
     <string name="delete_btn" translatable="false">Удалить</string>
     <string name="edit_playlist_title" translatable="false">Редактировать</string>
     <string name="edit_playlist_save_button" translatable="false">Сохранить</string>
+    <string name="load_service" translatable="false">Подготовка воспроизведения</string>
+    <string name="music_service" translatable="false">Music service</string>
+    <string name="music_service_description" translatable="false">Service for playing music</string>
 
     <plurals name="tracks_count" translatable="false">
         <item quantity="one">%d трек</item>
