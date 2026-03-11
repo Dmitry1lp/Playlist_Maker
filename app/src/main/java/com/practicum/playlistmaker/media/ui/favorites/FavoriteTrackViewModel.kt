@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.media.domain.db.FavoriteTrackInteractor
 import com.practicum.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class FavoriteTrackViewModel(
@@ -21,17 +24,17 @@ class FavoriteTrackViewModel(
 
     val clickDebounceDelay get() = CLICK_DEBOUNCE_DELAY
 
-    private val _favoritesUiState = MutableLiveData<FavoritesUiState>()
-    val observeFavoritesUiState: LiveData<FavoritesUiState> = _favoritesUiState
+    private val _favoritesUiState = MutableStateFlow<FavoritesUiState>(FavoritesUiState.Empty)
+    val favoritesUiState: StateFlow<FavoritesUiState> = _favoritesUiState.asStateFlow()
 
     private fun getFavoriteTracks() {
         viewModelScope.launch {
             favoriteTrackInteractor.getFavoriteTrack().collect { tracks ->
                 val tracksCopy = tracks.map { it.copy() }
                 if (tracksCopy.isNullOrEmpty()) {
-                    _favoritesUiState.postValue(FavoritesUiState.Empty)
+                    _favoritesUiState.value = FavoritesUiState.Empty
                 } else {
-                    _favoritesUiState.postValue(FavoritesUiState.Content(tracks))
+                    _favoritesUiState.value = FavoritesUiState.Content(tracks)
                 }
             }
         }

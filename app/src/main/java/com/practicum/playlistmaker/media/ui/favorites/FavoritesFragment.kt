@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -11,8 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentMediaFavoritesBinding
+import com.practicum.playlistmaker.media.ui.FavoritesScreen
 import com.practicum.playlistmaker.player.ui.PlayerFragment
 import com.practicum.playlistmaker.search.domain.models.Track
+import com.practicum.playlistmaker.settings.ui.PlaylistMakerTheme
 import com.practicum.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -32,79 +35,28 @@ class FavoritesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentMediaFavoritesBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        return ComposeView(requireContext()).apply {
+            setContent {
 
-        favoriteAdapter = FavoriteTrackAdapter(
-            tracks = emptyList(),
-            onItemClick = { track ->
-                onTrackClickDebounce(track)
-            },
-            onLongClick = { track ->
-                showDeleteFromFavoritesDialog(track)
+                PlaylistMakerTheme(){
+                    FavoritesScreen(
+                        viewModel = viewModel,
+                        onTrackClick = { track ->
+
+                            findNavController().navigate(
+                                R.id.action_mediaFragment2_to_playerFragment,
+                                PlayerFragment.createArgs(track)
+                            )
+
+                        }
+                    )
+                }
             }
-        )
-
-        binding.rvFavorites.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvFavorites.adapter = favoriteAdapter
-
-        onTrackClickDebounce = debounce<Track>(
-            delayMillis = viewModel.clickDebounceDelay,
-            scope = viewLifecycleOwner.lifecycleScope
-        ) { track ->
-            findNavController().navigate(
-                R.id.action_mediaFragment2_to_playerFragment,
-                PlayerFragment.createArgs(track)
-            )
         }
-
-        viewModel.observeFavoritesUiState.observe(viewLifecycleOwner) {
-            renderState(it)
-        }
-    }
-
-    private fun renderState(state: FavoritesUiState) {
-        when (state) {
-            is FavoritesUiState.Content -> showContent(state.tracks)
-            is FavoritesUiState.Empty -> showEmpty()
-        }
-    }
-
-    private fun showContent(tracks: List<Track>) {
-        binding.rvFavorites.visibility = View.VISIBLE
-        binding.ivPlaceholder.visibility = View.GONE
-        binding.tvPlaceholder.visibility = View.GONE
-        favoriteAdapter.update(tracks)
-    }
-
-    private fun showEmpty() {
-        binding.rvFavorites.visibility = View.GONE
-        binding.ivPlaceholder.visibility = View.VISIBLE
-        binding.tvPlaceholder.visibility = View.VISIBLE
-    }
-
-
-    private fun showDeleteFromFavoritesDialog(track: Track) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.delete_track_title)
-            .setNegativeButton(R.string.no, null)
-            .setPositiveButton(R.string.yes) { _, _ ->
-                viewModel.removeTrackFromPlaylist(track)
-            }
-            .show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     companion object {
-
         fun newInstance() = FavoritesFragment()
     }
 }

@@ -116,14 +116,14 @@ internal class PlayerService: Service(), AudioPlayerControl {
         mediaPlayer?.start()
         _playerState.update { PlayerState.Playing(getCurrentPlayerPosition())  }
         startTimer()
-        updateNotification()
+
     }
 
     override fun pausePlayer() {
         mediaPlayer?.pause()
         timerJob?.cancel()
         _playerState.update{ PlayerState.Paused(getCurrentPlayerPosition()) }
-        updateNotification()
+
     }
 
     override fun setTrack(track: Track) {
@@ -133,7 +133,9 @@ internal class PlayerService: Service(), AudioPlayerControl {
         mediaPlayer?.setDataSource(track.previewUrl)
         mediaPlayer?.prepareAsync()
         mediaPlayer?.setOnPreparedListener {
-            _playerState.update{ PlayerState.Prepared() }
+            _playerState.update { PlayerState.Prepared() }
+
+            enterForeground()
         }
         mediaPlayer?.setOnCompletionListener {
             timerJob?.cancel()
