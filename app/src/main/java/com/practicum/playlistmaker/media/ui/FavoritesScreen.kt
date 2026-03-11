@@ -80,7 +80,7 @@ fun FavoritesScreen(
                 Text(
                     text = stringResource(R.string.media_null),
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primaryContainer
+                    color = MaterialTheme.colorScheme.primary
                 )
 
             }

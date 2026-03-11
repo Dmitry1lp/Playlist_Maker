@@ -88,7 +88,7 @@ fun PlaylistsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primaryContainer
+                    color = MaterialTheme.colorScheme.primary
                     )
             }
         }
@@ -128,7 +128,8 @@ fun PlaylistItem(playlist: Playlist, onClick: () -> Unit) {
 
         Text(
             text = playlist.name,
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Text(
@@ -137,7 +138,8 @@ fun PlaylistItem(playlist: Playlist, onClick: () -> Unit) {
                 count = playlist.trackCount,
                 playlist.trackCount
             ),
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }

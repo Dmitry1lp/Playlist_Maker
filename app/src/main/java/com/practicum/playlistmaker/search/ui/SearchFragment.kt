@@ -44,7 +44,6 @@ class SearchFragment: Fragment() {
             setViewCompositionStrategy(
                 ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             )
-
             setContent {
                 PlaylistMakerTheme() {
                  SearchScreen(

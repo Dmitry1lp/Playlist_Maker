@@ -216,12 +216,6 @@ class SearchViewModel(
         return current
     }
 
-//    fun onSearchTextChanged(text: String) {
-//        updateClearTextIconVisibility(text.isNotEmpty())
-//        searchDebounce(text)
-//        updateHistoryVisibility(text.isEmpty())
-//    }
-
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
