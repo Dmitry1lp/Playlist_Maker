@@ -3,36 +3,50 @@ package com.practicum.playlistmaker.settings.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.settings.domain.models.SettingsInteractor
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class SettingsViewModel(private val settingsInteractor: SettingsInteractor) : ViewModel() {
 
-    private val _isDarkTheme = MutableLiveData(settingsInteractor.getDarkTheme())
-    val isDarkTheme: LiveData<Boolean> = _isDarkTheme
+    private val _isDarkTheme = MutableStateFlow(settingsInteractor.getDarkTheme())
+    val isDarkTheme: StateFlow<Boolean> = _isDarkTheme.asStateFlow()
 
-    private val sharedLiveData = SingleLiveEvent<String>()
-    fun observeSharedLiveData(): LiveData<String> = sharedLiveData
+    private val _shareEvent = MutableSharedFlow<String>()
+    val shareEvent: SharedFlow<String> = _shareEvent.asSharedFlow()
 
-    private val helpLiveData = SingleLiveEvent<String>()
-    fun observeHelpLiveData(): LiveData<String> = helpLiveData
+    private val _helpEvent = MutableSharedFlow<String>()
+    val helpEvent: SharedFlow<String> = _helpEvent.asSharedFlow()
 
-    private val agreementLiveData = SingleLiveEvent<String>()
-    fun observeAgreementLiveData(): LiveData<String> = agreementLiveData
+    private val _agreementEvent = MutableSharedFlow<String>()
+    val agreementEvent: SharedFlow<String> = _agreementEvent.asSharedFlow()
 
     init {
-        settingsInteractor.setDarkTheme(_isDarkTheme.value ?: false)
+        settingsInteractor.setDarkTheme(_isDarkTheme.value)
     }
 
     fun onShareClicked() {
-        sharedLiveData.value = "https://practicum.yandex.ru/profile/android-developer-plus"
+        viewModelScope.launch {
+            _shareEvent.emit("https://practicum.yandex.ru/profile/android-developer-plus")
+        }
     }
 
     fun onHelpClicked() {
-        helpLiveData.value = "perovdv1@ya.ru"
+        viewModelScope.launch {
+            _helpEvent.emit("perovdv1@ya.ru")
+        }
     }
 
     fun onAgreementClicked() {
-        agreementLiveData.value = "https://yandex.ru/legal/practicum_offer/"
+        viewModelScope.launch {
+            _agreementEvent.emit("https://yandex.ru/legal/practicum_offer/")
+        }
     }
 
     fun switchTheme(isDark: Boolean) {

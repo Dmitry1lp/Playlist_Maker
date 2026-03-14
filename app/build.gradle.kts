@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21"
     id("kotlin-kapt")
     id ("kotlin-parcelize")
     alias(libs.plugins.navigation.safe.args)
@@ -10,8 +11,6 @@ plugins {
 android {
     namespace = "com.practicum.playlistmaker"
     compileSdk = 36
-
-
 
     defaultConfig {
         applicationId = "com.practicum.playlistmaker"
@@ -25,6 +24,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 
     buildTypes {
@@ -59,6 +59,10 @@ dependencies {
 
     implementation("com.google.android.material:material:1.9.0")
 
+    implementation("androidx.compose.ui:ui:1.10.4")
+    implementation("androidx.compose.material:material:1.10.4")
+    implementation("androidx.activity:activity-compose:1.12.4")
+
 
     implementation("androidx.fragment:fragment-ktx:1.8.9")
 
@@ -71,12 +75,15 @@ dependencies {
     implementation("androidx.room:room-ktx:2.8.4")
 
     kapt("androidx.room:room-compiler:2.8.4")
-    
+
+    implementation("androidx.compose.material3:material3:1.4.0")
+
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("androidx.compose.foundation:foundation")
 
     implementation(libs.glide)
     implementation (libs.retrofit2.retrofit)
     implementation (libs.converter.gson)
-    implementation (libs.retrofit2.retrofit)
     implementation(libs.androidx.room.ktx)
     annotationProcessor(libs.compiler)
     implementation(libs.androidx.core.ktx)

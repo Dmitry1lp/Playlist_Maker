@@ -10,9 +10,17 @@ import com.practicum.playlistmaker.search.domain.interactor.SearchHistoryInterac
 import com.practicum.playlistmaker.search.domain.interactor.TracksInteractor
 import com.practicum.playlistmaker.search.domain.models.SearchResult
 import com.practicum.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SearchViewModel(
     private val tracksInteractor: TracksInteractor,
@@ -22,14 +30,14 @@ class SearchViewModel(
     private var mainThreadHandler = Handler(Looper.getMainLooper())
     private var cachedHistory: List<Track> = emptyList()
 
-    private val searchUiStateLiveData = MutableLiveData(SearchUiState())
-    val observeSearchUiStateLiveData: LiveData<SearchUiState> = searchUiStateLiveData
+    private val _uiState = MutableStateFlow(SearchUiState())
+    val uiState = _uiState.asStateFlow()
 
-    private val clearTextLiveData = MutableLiveData<Unit>()
-    val clearTextEvent: LiveData<Unit> get() = clearTextLiveData
+    private val _clearTextEvent = MutableSharedFlow<Unit>()
+    val clearTextEvent = _clearTextEvent.asSharedFlow()
 
-    private val playerLiveData = MutableLiveData<Track?>()
-    fun observePlayerLiveData(): MutableLiveData<Track?> = playerLiveData
+    private val _playerEvent = MutableSharedFlow<Track>()
+    val playerEvent = _playerEvent.asSharedFlow()
 
     private var latestSearchText: String? = null
     private var isClickAllowed = true
@@ -42,12 +50,12 @@ class SearchViewModel(
         viewModelScope.launch {
             cachedHistory = historyInteractor.getHistory()
             val showHistory = latestSearchText.isNullOrEmpty() && cachedHistory.isNotEmpty()
-            searchUiStateLiveData.postValue(
+            _uiState.value =
                 SearchUiState(
                     history = cachedHistory,
                     isHistoryVisible = showHistory
                 )
-            )
+
         }
     }
 
@@ -55,48 +63,42 @@ class SearchViewModel(
         if (cachedHistory.isNotEmpty()) {
             // Используем кэш, если он есть
             val showHistory = isInputEmpty && cachedHistory.isNotEmpty()
-            searchUiStateLiveData.postValue(
-                searchUiStateLiveData.value?.copy(
-                    history = cachedHistory,
-                    isHistoryVisible = showHistory
-                ) ?: SearchUiState(
+            _uiState.value =
+                _uiState.value.copy(
                     history = cachedHistory,
                     isHistoryVisible = showHistory
                 )
-            )
+
         } else {
             // Загружаем, если кэш пуст
             viewModelScope.launch {
                 cachedHistory = historyInteractor.getHistory()
                 val showHistory = isInputEmpty && cachedHistory.isNotEmpty()
-                searchUiStateLiveData.postValue(
-                    searchUiStateLiveData.value?.copy(
-                        history = cachedHistory,
-                        isHistoryVisible = showHistory
-                    ) ?: SearchUiState(
+                _uiState.value =
+                    _uiState.value.copy(
                         history = cachedHistory,
                         isHistoryVisible = showHistory
                     )
-                )
             }
         }
     }
     fun performSearch(searchText: String) {
         if (searchText.isEmpty()) {
-            searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
+            _uiState.value = _uiState.value.copy(
                 tracksState = TracksState.Empty,
                 isHistoryVisible = cachedHistory.isNotEmpty(),
                 isLoading = false
             )
             return
         }
-        searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
+        _uiState.value = _uiState.value.copy(
             tracksState = TracksState.Loading,
             isLoading = true,
             isHistoryVisible = false
         )
 
-        viewModelScope.launch {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             tracksInteractor
                 .searchTrack(searchText)
                 .collect{ result ->
@@ -105,7 +107,7 @@ class SearchViewModel(
                         is SearchResult.NotFound -> TracksState.ErrorFound
                         is SearchResult.NetworkError -> TracksState.ErrorInternet
                     }
-                    searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
+                    _uiState.value = _uiState.value.copy(
                         tracksState = newState,
                         isLoading = false,
                         isHistoryVisible = searchText.isEmpty() && cachedHistory.isNotEmpty()
@@ -126,7 +128,7 @@ class SearchViewModel(
                 delay(SEARCH_DEBOUNCE_DELAY)
                 performSearch(changedText)
             } else {
-                searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
+                _uiState.value = _uiState.value.copy(
                     tracksState = TracksState.Empty,
                     isLoading = false,
                     isHistoryVisible = cachedHistory.isNotEmpty()
@@ -137,32 +139,60 @@ class SearchViewModel(
     }
 
     fun onClearTextClicked() {
-        searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(isClearTextVisible = false)
-        clearTextLiveData.value = Unit
+
+        searchJob?.cancel()
+        latestSearchText = ""
+
+        _uiState.update { state ->
+            state.copy(
+                searchText = "",
+                isClearTextVisible = false,
+                tracksState = TracksState.Empty,
+                isHistoryVisible = state.history.isNotEmpty()
+            )
+        }
+
     }
 
     fun updateClearTextIconVisibility(hasText: Boolean) {
-        searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(isClearTextVisible = hasText)
+        _uiState.value = _uiState.value.copy(isClearTextVisible = hasText)
     }
 
     fun onTrackClicked(track: Track) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             historyInteractor.saveToHistory(track)
-            cachedHistory = historyInteractor.getHistory()
-            searchUiStateLiveData.postValue(
-                searchUiStateLiveData.value?.copy(history = cachedHistory)
-                    ?: SearchUiState(history = cachedHistory)
-            )
-            if (clickDebounce()) {
-                playerLiveData.value = track
+            val newHistory = historyInteractor.getHistory()
+            withContext(Dispatchers.Main) {
+                cachedHistory = newHistory
+                _uiState.value = _uiState.value.copy(history = cachedHistory)
             }
         }
+
+        if (clickDebounce()) {
+            viewModelScope.launch {
+                _playerEvent.emit(track)
+            }
+        }
+    }
+    fun onSearchTextChanged(text: String) {
+
+        _uiState.value = _uiState.value.copy(
+            searchText = text,
+            isClearTextVisible = text.isNotEmpty()
+        )
+
+        searchDebounce(text)
+        updateHistoryVisibility(text.isEmpty())
+    }
+
+    fun retrySearch() {
+        latestSearchText?.let { performSearch(it) }
     }
 
     fun clearHistory() {
         historyInteractor.clearTrackHistory()
         cachedHistory = emptyList()
-        searchUiStateLiveData.value = searchUiStateLiveData.value?.copy(
+        _uiState.value = _uiState.value.copy(
             history = emptyList(),
             isHistoryVisible = false
         )
@@ -184,12 +214,6 @@ class SearchViewModel(
             }
         }
         return current
-    }
-
-    fun onSearchTextChanged(text: String) {
-        updateClearTextIconVisibility(text.isNotEmpty())
-        searchDebounce(text)
-        updateHistoryVisibility(text.isEmpty())
     }
 
     companion object {
